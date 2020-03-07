@@ -208,7 +208,10 @@ withClock(io.nvdla_core_clk){
 
     val i_final_vld = i_sat_vld&i_sat_sel
 
-
+val u_x_relu = Module(new NV_NVDLA_HLS_relu(32))
+u_x_relu.io.data_in := i_final_result
+val relu_out = u_x_relu.io.data_out
+val relu_dout = Mux(io.cfg_relu_bypass, i_final_result, relu_out)
 
     io.out_partial_valid := RegNext(i_partial_vld, false.B)
 
