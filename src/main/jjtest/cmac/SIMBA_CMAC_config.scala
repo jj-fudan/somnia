@@ -16,9 +16,9 @@ class cmacConfiguration extends project_spec
 
     val CMAC_BPE = NVDLA_BPE //bits per element
 
-    val CMAC_ATOMC = NVDLA_MAC_ATOMIC_C_SIZE 
+    val CMAC_ATOMC = PE_MAC_ATOMIC_C_SIZE 
 
-    val CMAC_ATOMK = NVDLA_MAC_ATOMIC_K_SIZE
+    val CMAC_ATOMK = PE_MAC_ATOMIC_K_SIZE
 
     val CMAC_ATOMK_HALF  = CMAC_ATOMK/2
 
