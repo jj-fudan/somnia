@@ -20,6 +20,12 @@ object caccLauncher {
           (c) => new SOMNIA_CACC_assembly_ctrlTests(c)
         }
       },
+     "SOMNIA_CACC_int8" -> { 
+        (manager: TesterOptionsManager) =>
+        Driver.execute(() => new SOMNIA_CACC_CALC_int8, manager) {
+          (c) => new SOMNIA_CACC_INT8_Tests(c)
+        }
+      }
   )
   def main(args: Array[String]): Unit = {
     TutorialRunner("cacc", cacc, args)
