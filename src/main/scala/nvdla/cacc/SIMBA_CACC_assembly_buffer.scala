@@ -5,7 +5,7 @@ import chisel3.experimental._
 import chisel3.util._
 
 
-class SOMNIA_CACC_assembly_buffer(implicit conf: somniaConfig) extends Module {
+class SOMNIA_CACC_assembly_buffer(implicit val conf: somniaConfig) extends Module {
 
     val io = IO(new Bundle {
         //clk
@@ -39,11 +39,12 @@ class SOMNIA_CACC_assembly_buffer(implicit conf: somniaConfig) extends Module {
 //             │ ─┤ ─┤       │ ─┤ ─┤         
 //             └──┴──┘       └──┴──┘ 
 
-withClock(io.somnia_core_clk){
-
+//withClock(io.somnia_core_clk){
+withClock(clock){
     val u_accu_abuf_0 = Module(new nv_ram_rws(conf.CACC_ABUF_DEPTH, conf.CACC_ABUF_WIDTH))
 
-    u_accu_abuf_0.io.clk := io.somnia_core_clk
+    //u_accu_abuf_0.io.clk := io.somnia_core_clk
+    u_accu_abuf_0.io.clk := clock
     u_accu_abuf_0.io.ra := io.abuf_rd.addr.bits
     u_accu_abuf_0.io.re := io.abuf_rd.addr.valid
     u_accu_abuf_0.io.we := io.abuf_wr.addr.valid

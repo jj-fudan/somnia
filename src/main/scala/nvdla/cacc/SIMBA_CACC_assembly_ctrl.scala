@@ -58,8 +58,8 @@ class SOMNIA_CACC_assembly_ctrl(implicit conf: somniaConfig) extends Module {
 //           └─┐  ┐  ┌───────┬──┐  ┌──┘         
 //             │ ─┤ ─┤       │ ─┤ ─┤         
 //             └──┴──┘       └──┴──┘ 
-withClock(io.somnia_core_clk){
-
+//withClock(io.somnia_core_clk){
+withClock(clock){
 val accu_valid = RegNext(io.mac2accu_pd.valid, false.B)
 val accu_pd = RegEnable(io.mac2accu_pd.bits, "b0".asUInt(9.W), io.mac2accu_pd.valid)
 //////////////////////////////////////////////////////////////
@@ -99,7 +99,8 @@ when(layer_st | accu_valid){
     accu_channel_st := accu_channel_st_w
 }
 
-io.cfg_truncate := RegEnable(io.reg2dp_clip_truncate, false.B, layer_st)
+//io.cfg_truncate := RegEnable(io.reg2dp_clip_truncate, false.B, layer_st)
+io.cfg_truncate := RegEnable(io.reg2dp_clip_truncate, 0.U(5.W), layer_st)
 io.cfg_relu_bypass := RegEnable(io.reg2dp_relu_bypass, false.B, layer_st)
 io.cfg_in_en_mask := RegEnable(cfg_in_en_mask_w, false.B, layer_st)
 
