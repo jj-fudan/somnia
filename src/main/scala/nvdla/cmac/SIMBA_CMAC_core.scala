@@ -52,7 +52,8 @@ class SOMNIA_CMAC_core(implicit val conf: somniaConfig) extends Module {
     //==========================================================
     val u_rt_in = Module(new SOMNIA_CMAC_CORE_rt_in(useRealClock = true))
 
-    u_rt_in.io.somnia_core_clk := somnia_op_gated_clk(conf.CMAC_ATOMK)
+    //u_rt_in.io.somnia_core_clk := somnia_op_gated_clk(conf.CMAC_ATOMK)
+    u_rt_in.io.somnia_core_clk := clock
     u_rt_in.io.sc2mac_dat <> io.sc2mac_dat
     u_rt_in.io.sc2mac_wt <> io.sc2mac_wt
 
@@ -61,7 +62,10 @@ class SOMNIA_CMAC_core(implicit val conf: somniaConfig) extends Module {
     //==========================================================
     val u_active = Module(new SOMNIA_CMAC_CORE_active(useRealClock = true))
 
-    u_active.io.somnia_core_clk := somnia_op_gated_clk(conf.CMAC_ATOMK+1)
+    //u_active.io.somnia_core_clk := somnia_op_gated_clk(conf.CMAC_ATOMK+1)
+    u_active.io.somnia_core_clk := clock
+
+
     u_active.io.in_dat <> u_rt_in.io.in_dat
     u_active.io.in_dat_stripe_end := u_rt_in.io.in_dat.bits.pd(conf.PKT_nvdla_stripe_info_stripe_st_FIELD)                 //|< w
     u_active.io.in_dat_stripe_st := u_rt_in.io.in_dat.bits.pd(conf.PKT_nvdla_stripe_info_stripe_end_FIELD)               //|< w
@@ -75,7 +79,8 @@ class SOMNIA_CMAC_core(implicit val conf: somniaConfig) extends Module {
 
     for(i<- 0 to conf.CMAC_ATOMK-1){
 
-        u_mac(i).io.somnia_core_clk := somnia_op_gated_clk(i)
+        //u_mac(i).io.somnia_core_clk := somnia_op_gated_clk(i)
+        u_mac(i).io.somnia_core_clk := clock
 
         u_mac(i).io.dat_actv <> u_active.io.dat_actv(i)
         u_mac(i).io.wt_actv <> u_active.io.wt_actv(i)
@@ -87,9 +92,13 @@ class SOMNIA_CMAC_core(implicit val conf: somniaConfig) extends Module {
     //==========================================================
     // output retiming logic
     //==========================================================
-    u_rt_out.io.somnia_core_clk := somnia_op_gated_clk(conf.CMAC_ATOMK+2)
-    u_rt_out.io.out.valid := withClock(io.somnia_clock.somnia_core_clk){ShiftRegister(u_rt_in.io.in_dat.valid, conf.MAC_PD_LATENCY)}     //|< w
-    u_rt_out.io.out.bits.pd := withClock(io.somnia_clock.somnia_core_clk){ShiftRegister(u_rt_in.io.in_dat.bits.pd, conf.MAC_PD_LATENCY, u_rt_in.io.in_dat.valid)}     //|< w
+    //u_rt_out.io.somnia_core_clk := somnia_op_gated_clk(conf.CMAC_ATOMK+2)
+    //u_rt_out.io.out.valid := withClock(io.somnia_clock.somnia_core_clk){ShiftRegister(u_rt_in.io.in_dat.valid, conf.MAC_PD_LATENCY)}     //|< w
+    //u_rt_out.io.out.bits.pd := withClock(io.somnia_clock.somnia_core_clk){ShiftRegister(u_rt_in.io.in_dat.bits.pd, conf.MAC_PD_LATENCY, u_rt_in.io.in_dat.valid)}     //|< w
+     u_rt_out.io.somnia_core_clk := clock
+     u_rt_out.io.out.valid := withClock(clock){ShiftRegister(u_rt_in.io.in_dat.valid, conf.MAC_PD_LATENCY)} 
+
+     u_rt_out.io.out.bits.pd := withClock(clock){ShiftRegister(u_rt_in.io.in_dat.bits.pd, conf.MAC_PD_LATENCY, u_rt_in.io.in_dat.valid)}
 
     io.dp2reg_done := u_rt_out.io.dp2reg_done                   //|> o
     io.mac2accu <> u_rt_out.io.mac2accu         //|> o )
@@ -100,6 +109,11 @@ class SOMNIA_CMAC_core(implicit val conf: somniaConfig) extends Module {
 
     for(i<- 0 to conf.CMAC_ATOMK+2){
         u_slcg_op(i).io.somnia_clock <> io.somnia_clock
+        //u_slcg_op(i).io.somnia_clock.somnia_core_clk := clock
+        //u_slcg_op(i).io.somnia_clock.dla_clk_ovr_on_sync := clock
+        //u_slcg_op(i).io.somnia_clock.global_clk_ovr_on_sync := clock
+        //u_slcg_op(i).io.somnia_clock.tmc2slcg_disable_clock_gating :=io.somnia_clock.tmc2slcg_disable_clock_gating
+
         u_slcg_op(i).io.slcg_en(0) := io.slcg_op_en(i)
         somnia_op_gated_clk(i) := u_slcg_op(i).io.somnia_core_gated_clk
     }

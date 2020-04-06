@@ -5,7 +5,7 @@ import chisel3.experimental._
 import chisel3.util._
 
 
-class SOMNIA_CMAC_CORE_rt_in(useRealClock:Boolean = false)(implicit val conf: somniaConfig) extends Module {
+class SOMNIA_CMAC_CORE_rt_in(useRealClock:Boolean = true)(implicit val conf: somniaConfig) extends Module {
     val io = IO(new Bundle {
         //clock
         val somnia_core_clk = Input(Clock())
@@ -41,10 +41,9 @@ class SOMNIA_CMAC_CORE_rt_in(useRealClock:Boolean = false)(implicit val conf: so
 //           └─┐  ┐  ┌───────┬──┐  ┌──┘         
 //             │ ─┤ ─┤       │ ─┤ ─┤         
 //             └──┴──┘       └──┴──┘ 
-    val internal_clock = if(useRealClock) io.somnia_core_clk else clock
-
-    class rt_inImpl{
-
+    
+    withClock(io.somnia_core_clk){
+    //withClock(clock){
     // retiming init
 
     val in_rt_dat_data_d = retiming(Vec(conf.CMAC_ATOMC, UInt(conf.CMAC_BPE.W)), conf.CMAC_IN_RT_LATENCY)
@@ -114,8 +113,7 @@ class SOMNIA_CMAC_CORE_rt_in(useRealClock:Boolean = false)(implicit val conf: so
 
     }
 
-    val rt_in = withClock(internal_clock){new rt_inImpl}
-
+   
 }
 
 object SOMNIA_CMAC_CORE_rt_inDriver extends App {

@@ -52,16 +52,29 @@ withReset(!io.somnia_core_rstn){
     val u_reg = Module(new SOMNIA_CMAC_reg)
     //clk
     u_core.io.somnia_clock <> io.somnia_clock         //|< b
-    u_reg.io.somnia_core_clk := io.somnia_clock.somnia_core_clk        //|< i
-    u_core.io.slcg_op_en := u_reg.io.slcg_op_en           
+    //u_reg.io.somnia_core_clk := io.somnia_clock.somnia_core_clk        //|< i
+    //u_core.io.slcg_op_en := u_reg.io.slcg_op_en           
     
-    u_core.io.sc2mac_dat <> io.sc2mac_dat               //|< b
-    u_core.io.sc2mac_wt <> io.sc2mac_wt         //|< b
-    io.mac2accu <> u_core.io.mac2accu                 //|> b
+    //u_core.io.sc2mac_dat <> io.sc2mac_dat               //|< b
+    //u_core.io.sc2mac_wt <> io.sc2mac_wt         //|< b
+    //io.mac2accu <> u_core.io.mac2accu                 //|> b
       
-    u_reg.io.dp2reg_done := u_core.io.dp2reg_done       //|< i
-    u_reg.io.csb2cmac_a <> io.csb2cmac_a        //|< b
+    //u_reg.io.dp2reg_done := u_core.io.dp2reg_done       //|< i
+    //u_reg.io.csb2cmac_a <> io.csb2cmac_a        //|< b
 
+
+    //u_core.io.somnia_clock.somnia_core_clk := clock
+    //u_core.io.somnia_clock.dla_clk_ovr_on_sync := clock
+    //u_core.io.somnia_clock.global_clk_ovr_on_sync := clock
+    //u_core.io.somnia_clock.tmc2slcg_disable_clock_gating := io.somnia_clock.tmc2slcg_disable_clock_gating
+    u_reg.io.somnia_core_clk := clock
+    u_core.io.slcg_op_en := u_reg.io.slcg_op_en
+    
+    u_core.io.sc2mac_dat <> io.sc2mac_dat
+    u_core.io.sc2mac_wt <> io.sc2mac_wt
+    io.mac2accu <> u_core.io.mac2accu
+    u_reg.io.dp2reg_done := u_core.io.dp2reg_done
+    u_reg.io.csb2cmac_a <> io.csb2cmac_a
 }}
 
 
