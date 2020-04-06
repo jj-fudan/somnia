@@ -6,13 +6,13 @@ import chisel3.util.ValidIO
 
 import scala.util.Random
 
-class NV_NVDLA_CMAC_CORE_activateTest(c: NV_NVDLA_CMAC_CORE_active) extends PeekPokeTester(c){
+class SOMNIA_CMAC_CORE_activateTest(c: SOMNIA_CMAC_CORE_active) extends PeekPokeTester(c){
   def encourage_data(size:Int = 0): Map[String, List[Int]]={
-    val sel = List.fill[Int](c.conf.NVDLA_MAC_ATOMIC_K_SIZE_DIV2)(1)
-    val mask = List.fill[Int](c.conf.NVDLA_MAC_ATOMIC_C_SIZE)(Random.nextInt(2))
-    val data = List.fill[Int](c.conf.NVDLA_MAC_ATOMIC_C_SIZE)(Random.nextInt(256))
+    val sel = List.fill[Int](c.conf.PE_MAC_ATOMIC_K_SIZE)(1)
+    val mask = List.fill[Int](c.conf.PE_MAC_ATOMIC_C_SIZE)(Random.nextInt(2))
+    val data = List.fill[Int](c.conf.PE_MAC_ATOMIC_C_SIZE)(Random.nextInt(256))
     val valid = List.fill[Int](1)(1)
-    (c.io.in_dat.bits.sel, sel).zipped.foreach(poke(_, _))
+//    (c.io.in_dat.bits.sel, sel).zipped.foreach(poke(_, _))
     (c.io.in_dat.bits.mask, mask).zipped.foreach(poke(_, _))
     (c.io.in_dat.bits.data, data).zipped.foreach(poke(_, _))
     poke(c.io.in_dat.valid, valid(0))
@@ -20,9 +20,9 @@ class NV_NVDLA_CMAC_CORE_activateTest(c: NV_NVDLA_CMAC_CORE_active) extends Peek
   }
 
   def encourage_wt(size:Int = 0): Map[String, List[Int]] ={
-    val sel = List.fill[Int](c.conf.NVDLA_MAC_ATOMIC_K_SIZE_DIV2)(1)
-    val mask = List.fill[Int](c.conf.NVDLA_MAC_ATOMIC_C_SIZE)(1)
-    val wt = List.fill[Int](c.conf.NVDLA_MAC_ATOMIC_C_SIZE)(Random.nextInt(256))
+    val sel = List.fill[Int](c.conf.PE_MAC_ATOMIC_K_SIZE)(1)
+    val mask = List.fill[Int](c.conf.PE_MAC_ATOMIC_C_SIZE)(1)
+    val wt = List.fill[Int](c.conf.PE_MAC_ATOMIC_C_SIZE)(Random.nextInt(256))
     val valid = List.fill[Int](1)(1)
     (c.io.in_wt.bits.sel, sel).zipped.foreach(poke(_, _))
     (c.io.in_wt.bits.mask, mask).zipped.foreach(poke(_, _))
@@ -68,10 +68,10 @@ class NV_NVDLA_CMAC_CORE_activateTest(c: NV_NVDLA_CMAC_CORE_active) extends Peek
   }
 }
 
-class NV_NVDLA_CMAC_CORE_activateTester extends ChiselFlatSpec{
+class SOMNIA_CMAC_CORE_activateTester extends ChiselFlatSpec{
   "running with --generate-vcd-output on" should "create a vcd file from your test" in {
     implicit val cmacconf: cmacConfiguration = new cmacConfiguration
-    implicit val nvconf: nvdlaConfig = new nvdlaConfig
+    implicit val nvconf: somniaConfig = new somniaConfig
     iotesters.Driver.execute(
       Array(
         "--generate-vcd-output", "on",
@@ -80,9 +80,9 @@ class NV_NVDLA_CMAC_CORE_activateTester extends ChiselFlatSpec{
         "--backend-name", "verilator",
         // "-tmvf", "-full64 -cpp g++-4.8 -cc gcc-4.8 -LDFLAGS -Wl,-no-as-needed +memcbk  +vcs+dumparrays -debug_all"
       ),
-      () => new NV_NVDLA_CMAC_CORE_active()
+      () => new SOMNIA_CMAC_CORE_active()
     ) {
-      c => new NV_NVDLA_CMAC_CORE_activateTest(c)
+      c => new SOMNIA_CMAC_CORE_activateTest(c)
     } should be(true)
   }
 }

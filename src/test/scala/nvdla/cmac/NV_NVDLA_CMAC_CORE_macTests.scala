@@ -3,9 +3,9 @@ package nvdla
 import chisel3.iotesters.{PeekPokeTester, Driver, ChiselFlatSpec}
 
 
-class NV_NVDLA_CMAC_CORE_macTests(c: NV_NVDLA_CMAC_CORE_mac) extends PeekPokeTester(c) {
+class SOMNIA_CMAC_CORE_macTests(c: SOMNIA_CMAC_CORE_mac) extends PeekPokeTester(c) {
  
-  implicit val conf: nvdlaConfig = new nvdlaConfig
+  implicit val conf: somniaConfig = new somniaConfig
 
   for (t <- 0 until 1000) {
 
@@ -46,23 +46,27 @@ class NV_NVDLA_CMAC_CORE_macTests(c: NV_NVDLA_CMAC_CORE_mac) extends PeekPokeTes
     }
     
     val sum_out = mout.reduce(_+_)
+    
 
     step(conf.CMAC_OUT_RETIMING)
 
     if(wt_pvld(0)&dat_pvld(0)){
-      expect(c.io.mac_out.bits, sum_out)
+	if(sum_out<0){
+      expect(c.io.mac_out.bits, 524288+sum_out)}
+ 	else{
+	expect(c.io.mac_out.bits, sum_out)}
       expect(c.io.mac_out.valid, wt_pvld(0)&dat_pvld(0))
     }
   }
 }
 
-class NV_NVDLA_CMAC_CORE_macTester extends ChiselFlatSpec {
+class SOMNIA_CMAC_CORE_macTester extends ChiselFlatSpec {
 
-  behavior of "NV_NVDLA_CMAC_CORE_mac"
+  behavior of "SOMNIA_CMAC_CORE_mac"
   backends foreach {backend =>
     it should s"correctly perform mac logic $backend" in {
-      implicit val nvconf: nvdlaConfig = new nvdlaConfig
-      Driver(() => new NV_NVDLA_CMAC_CORE_mac())(c => new NV_NVDLA_CMAC_CORE_macTests(c)) should be (true)
+      implicit val nvconf: somniaConfig = new somniaConfig
+      Driver(() => new SOMNIA_CMAC_CORE_mac())(c => new SOMNIA_CMAC_CORE_macTests(c)) should be (true)
     }
   }
 }

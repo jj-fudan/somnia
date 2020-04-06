@@ -3,7 +3,7 @@ package nvdla
 import chisel3._
 import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 
-class NV_NVDLA_CMAC_REG_single_Tests(c: NV_NVDLA_CMAC_REG_single) extends PeekPokeTester(c) {
+class SOMNIA_CMAC_REG_single_Tests(c: NV_NVDLA_BASIC_REG_single) extends PeekPokeTester(c) {
 
   val R = scala.util.Random
 
@@ -70,13 +70,13 @@ class NV_NVDLA_CMAC_REG_single_Tests(c: NV_NVDLA_CMAC_REG_single) extends PeekPo
 
 }
 
-class NV_NVDLA_CMAC_REG_single_Tester extends ChiselFlatSpec {
+class SOMNIA_CMAC_REG_single_Tester extends ChiselFlatSpec {
   behavior of "NV_NVDLA_CMAC_REG_single"
   "running with --generate-vcd-output on" should "create a vcd file from your test" in {
-    val args = Array("-tbn", "verilator", "-tgvo", "on", "--target-dir", "test_run_dir/NV_NVDLA_CMAC_REG_single_Tester",
+    val args = Array("-tbn", "verilator", "-tgvo", "on", "--target-dir", "test_run_dir/SOMNIA_CMAC_REG_single_Tester",
       "--top-name", "NV_NVDLA_CMAC_REG_single_Tester")
-    Driver.execute(args, () => new NV_NVDLA_CMAC_REG_single) {
-      c => new NV_NVDLA_CMAC_REG_single_Tests(c)
+    Driver.execute(args, () => new NV_NVDLA_BASIC_REG_single) {
+      c => new SOMNIA_CMAC_REG_single_Tests(c)
     } should be(true)
   }
 }

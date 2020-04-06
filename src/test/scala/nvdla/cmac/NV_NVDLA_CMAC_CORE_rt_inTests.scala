@@ -3,10 +3,10 @@ package nvdla
 import chisel3.iotesters.{PeekPokeTester, Driver, ChiselFlatSpec}
 
 
-class NV_NVDLA_CMAC_CORE_rt_inTests(c: NV_NVDLA_CMAC_CORE_rt_in) extends PeekPokeTester(c) {
+class SOMNIA_CMAC_CORE_rt_inTests(c: SOMNIA_CMAC_CORE_rt_in) extends PeekPokeTester(c) {
  
-  implicit val conf: nvdlaConfig = new nvdlaConfig
-
+  implicit val conf: somniaConfig = new somniaConfig
+  
   for (t <- 0 until 100) {
     //load random inputs
 
@@ -17,7 +17,7 @@ class NV_NVDLA_CMAC_CORE_rt_inTests(c: NV_NVDLA_CMAC_CORE_rt_in) extends PeekPok
 
     val sc2mac_wt_data = Array.fill(conf.CMAC_ATOMC){0}
     val sc2mac_wt_mask = Array.fill(conf.CMAC_ATOMC){false}
-    val sc2mac_wt_sel = Array.fill(conf.CMAC_ATOMK_HALF){false}
+    val sc2mac_wt_sel = Array.fill(conf.CMAC_ATOMK){false}
     val sc2mac_wt_pvld = rnd.nextBoolean()
 
     poke(c.io.sc2mac_dat.bits.pd, sc2mac_dat_pd)
@@ -40,7 +40,7 @@ class NV_NVDLA_CMAC_CORE_rt_inTests(c: NV_NVDLA_CMAC_CORE_rt_in) extends PeekPok
 
     }
 
-    for (i <- 0 to conf.CMAC_ATOMK_HALF-1){
+    for (i <- 0 to conf.CMAC_ATOMK-1){
 
       sc2mac_wt_sel(i) = rnd.nextBoolean()
 
@@ -79,7 +79,7 @@ class NV_NVDLA_CMAC_CORE_rt_inTests(c: NV_NVDLA_CMAC_CORE_rt_in) extends PeekPok
           expect(c.io.in_wt.bits.data(i), sc2mac_wt_data(i))
         }
       }     
-      for (j <- 0 to conf.CMAC_ATOMK_HALF-1){
+      for (j <- 0 to conf.CMAC_ATOMK-1){
         //wt sel
         expect(c.io.in_wt.bits.sel(j), sc2mac_wt_sel(j))
       }  
@@ -88,13 +88,13 @@ class NV_NVDLA_CMAC_CORE_rt_inTests(c: NV_NVDLA_CMAC_CORE_rt_in) extends PeekPok
 
 }}
 
-class NV_NVDLA_CMAC_CORE_rt_inTester extends ChiselFlatSpec {
+class SOMNIA_CMAC_CORE_rt_inTester extends ChiselFlatSpec {
 
-  behavior of "NV_NVDLA_CMAC_CORE_rt_in"
+  behavior of "SOMNIA_CMAC_CORE_rt_in"
   backends foreach {backend =>
     it should s"correctly retiming wt and dat $backend" in {
-      implicit val conf: nvdlaConfig = new nvdlaConfig
-      Driver(() => new NV_NVDLA_CMAC_CORE_rt_in())(c => new NV_NVDLA_CMAC_CORE_rt_inTests(c)) should be (true)
+      implicit val conf: somniaConfig = new somniaConfig
+      Driver(() => new SOMNIA_CMAC_CORE_rt_in())(c => new SOMNIA_CMAC_CORE_rt_inTests(c)) should be (true)
     }
   }
 }

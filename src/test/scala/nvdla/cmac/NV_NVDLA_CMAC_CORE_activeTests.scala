@@ -3,9 +3,9 @@ package nvdla
 import chisel3.iotesters.{PeekPokeTester, Driver, ChiselFlatSpec}
 
 
-class NV_NVDLA_CMAC_CORE_activeTests(c: NV_NVDLA_CMAC_CORE_active) extends PeekPokeTester(c) {
+class SOMNIA_CMAC_CORE_activeTests(c: SOMNIA_CMAC_CORE_active) extends PeekPokeTester(c) {
  
-  implicit val conf: nvdlaConfig = new nvdlaConfig
+  implicit val conf: somniaConfig = new somniaConfig
 
 //==========================================================
 //test dat data forwading 
@@ -24,10 +24,10 @@ class NV_NVDLA_CMAC_CORE_activeTests(c: NV_NVDLA_CMAC_CORE_active) extends PeekP
     val in_wt_data = Array.fill(conf.CMAC_ATOMC){0}
     val in_wt_mask = Array.fill(conf.CMAC_ATOMC){false}
     val in_wt_pvld = rnd.nextBoolean()
-    val in_wt_sel = Array.fill(conf.CMAC_ATOMK_HALF){false}
+    val in_wt_sel = Array.fill(conf.CMAC_ATOMK){false}
 
     //assign st, end, pvld
-//    poke(c.io.in_dat_pvld, in_dat_pvld)
+    poke(c.io.in_dat.valid, in_dat_pvld)
     poke(c.io.in_wt.valid, in_wt_pvld)
 
     poke(c.io.in_dat_stripe_st, in_dat_stripe_st)
@@ -42,8 +42,8 @@ class NV_NVDLA_CMAC_CORE_activeTests(c: NV_NVDLA_CMAC_CORE_active) extends PeekP
       in_wt_data(i) = rnd.nextInt(1<<conf.CMAC_BPE)
       in_wt_mask(i) = rnd.nextBoolean()
 
-//      poke(c.io.in_dat_data(i), in_dat_data(i))
-//      poke(c.io.in_dat_mask(i), in_dat_mask(i))
+      poke(c.io.in_dat.bits.data(i), in_dat_data(i))
+      poke(c.io.in_dat.bits.mask(i), in_dat_mask(i))
 
       poke(c.io.in_wt.bits.data(i), in_wt_data(i))
       poke(c.io.in_wt.bits.mask(i), in_wt_mask(i))
@@ -51,7 +51,7 @@ class NV_NVDLA_CMAC_CORE_activeTests(c: NV_NVDLA_CMAC_CORE_active) extends PeekP
     }
 
     //assign wt sel
-    for(i <- 0 until conf.CMAC_ATOMK_HALF){
+    for(i <- 0 until conf.CMAC_ATOMK){
 
       in_wt_sel(i) = rnd.nextBoolean()
 
@@ -66,7 +66,7 @@ class NV_NVDLA_CMAC_CORE_activeTests(c: NV_NVDLA_CMAC_CORE_active) extends PeekP
     expect(c.io.in_dat_stripe_end, in_dat_stripe_end)
 
     //check dat valid
-    for(i <- 0 until conf.CMAC_ATOMK_HALF){
+    for(i <- 0 until conf.CMAC_ATOMK){
         for(j <- 0 until conf.CMAC_ATOMC){
           expect(c.io.dat_actv(i)(j).valid, in_dat_pvld)
       }
@@ -74,7 +74,7 @@ class NV_NVDLA_CMAC_CORE_activeTests(c: NV_NVDLA_CMAC_CORE_active) extends PeekP
 
     //check that dat pack
     if(in_dat_pvld){
-      for(i <- 0 until conf.CMAC_ATOMK_HALF){
+      for(i <- 0 until conf.CMAC_ATOMK){
           for(j <- 0 until conf.CMAC_ATOMC){
             expect(c.io.dat_actv(i)(j).bits.nz, in_dat_mask(j))
             if(in_dat_mask(j)){
@@ -94,11 +94,11 @@ class NV_NVDLA_CMAC_CORE_activeTests(c: NV_NVDLA_CMAC_CORE_active) extends PeekP
 
 class NV_NVDLA_CMAC_CORE_activeTester extends ChiselFlatSpec {
 
-  behavior of "NV_NVDLA_CMAC_CORE_active"
+  behavior of "SOMNIA_CMAC_CORE_active"
   backends foreach {backend =>
     it should s"correctly activate wt and dat $backend" in {
-      implicit val nvconf: nvdlaConfig = new nvdlaConfig
-      Driver(() => new NV_NVDLA_CMAC_CORE_active())(c => new NV_NVDLA_CMAC_CORE_activeTests(c)) should be (true)
+      implicit val nvconf: somniaConfig = new somniaConfig
+      Driver(() => new SOMNIA_CMAC_CORE_active())(c => new SOMNIA_CMAC_CORE_activeTests(c)) should be (true)
     }
   }
 }
