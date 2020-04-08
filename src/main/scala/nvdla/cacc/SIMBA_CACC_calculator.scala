@@ -63,7 +63,8 @@ class SOMNIA_CACC_calculator(implicit conf: somniaConfig) extends Module {
 //             │ ─┤ ─┤       │ ─┤ ─┤         
 //             └──┴──┘       └──┴──┘ 
 
-withClock(io.somnia_core_clk){             
+//withClock(io.somnia_core_clk){
+withClock(clock){           
     // unpack abuffer read data
     val abuf_in_data = VecInit((0 to conf.CACC_ATOMK-1) 
                         map { i => io.abuf_rd_data(conf.CACC_PARSUM_WIDTH*(i+1)-1, conf.CACC_PARSUM_WIDTH*i)})
@@ -71,7 +72,7 @@ withClock(io.somnia_core_clk){
     val accu_ctrl_pd_d1 = RegEnable(io.accu_ctrl_pd.bits, "b0".asUInt(13.W), io.accu_ctrl_pd.valid)
     val calc_valid_in = io.mac2accu_pvld
 
-    val calc_valid = ShiftRegister(calc_valid_in, 3, false.B, true.B)
+    val calc_valid = ShiftRegister(calc_valid_in, 3)
 
     // unpack pd form abuffer control
     val calc_addr = accu_ctrl_pd_d1(5, 0)
@@ -107,7 +108,8 @@ withClock(io.somnia_core_clk){
     val u_cell_int8 = Array.fill(conf.CACC_ATOMK){Module(new SOMNIA_CACC_CALC_int8)}
 
     for(i <- 0 to conf.CACC_ATOMK-1){
-        u_cell_int8(i).io.somnia_core_clk := io.somnia_cell_clk
+        //u_cell_int8(i).io.somnia_core_clk := io.somnia_cell_clk
+        u_cell_int8(i).io.somnia_core_clk := clock
         u_cell_int8(i).io.cfg_truncate := io.cfg_truncate
         u_cell_int8(i).io.cfg_relu_bypass := io.cfg_relu_bypass
         u_cell_int8(i).io.in_data := calc_op0(i)
@@ -173,21 +175,11 @@ withClock(io.somnia_core_clk){
     // Gather of accumulator result   
     val calc_pout = Wire(Vec(conf.CACC_ATOMK, UInt(conf.CACC_PARSUM_WIDTH.W)))
     for (i <- 0 to conf.CACC_ATOMK-1){
-        when(calc_pout_vld(i)){
-            calc_pout(i) := calc_pout_sum(i)
-        }
-        .otherwise{
-            calc_pout(i) := 0.U
-        }
+        calc_pout(i) := Fill(conf.CACC_PARSUM_WIDTH, calc_pout_vld(i)) & calc_pout_sum(i)
     }
     val calc_fout = Wire(Vec(conf.CACC_ATOMK, UInt(conf.CACC_FINAL_WIDTH.W)))
     for (i <- 0 to conf.CACC_ATOMK-1){
-        when(calc_fout_vld(i)){
-            calc_fout(i) := calc_fout_sum(i)
-        }
-        .otherwise{
-            calc_fout(i) := 0.U
-        }
+       calc_fout(i) := Fill(conf.CACC_FINAL_WIDTH, calc_fout_vld(i)) & calc_fout_sum(i)
     }  
 
     // to abuffer, 1 pipe
