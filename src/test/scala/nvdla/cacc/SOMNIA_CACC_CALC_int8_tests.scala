@@ -5,7 +5,8 @@ import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 import chisel3.util._
 
 class SOMNIA_CACC_INT8_Tests (c:SOMNIA_CACC_CALC_int8) extends PeekPokeTester(c){
-  val in_data = "b0111010001011100011000".U
+  //val in_data = "b0111010001011100011000".U
+  val in_data = "b0111010001011100011".U
   val in_op   = "b0111111111111111101111011110000000".U
   poke(c.io.in_data,in_data)
   poke(c.io.in_op,in_op)
