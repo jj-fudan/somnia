@@ -31,8 +31,19 @@ object caccLauncher {
         Driver.execute(() => new SOMNIA_CACC_calculator, manager) {
           (c) => new SOMNIA_CACC_calculator_Tests(c)
         }
+      },
+     "SOMNIA_CACC_delivery_buffer" -> { 
+        (manager: TesterOptionsManager) =>
+        Driver.execute(() => new SOMNIA_CACC_delivery_buffer, manager) {
+          (c) => new SOMNIA_CACC_delivery_buffer_Tests(c)
+        }
+      },
+     "SOMNIA_CACC_delivery_ctrl" -> { 
+        (manager: TesterOptionsManager) =>
+        Driver.execute(() => new SOMNIA_CACC_delivery_ctrl, manager) {
+          (c) => new SOMNIA_CACC_delivery_ctrl_Tests(c)
+        }
       }
-
   )
   def main(args: Array[String]): Unit = {
     TutorialRunner("cacc", cacc, args)
