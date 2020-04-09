@@ -50,8 +50,8 @@ class SOMNIA_CACC_delivery_ctrl(implicit conf: somniaConfig) extends Module {
 //           └─┐  ┐  ┌───────┬──┐  ┌──┘         
 //             │ ─┤ ─┤       │ ─┤ ─┤         
 //             └──┴──┘       └──┴──┘
-withClock(io.somnia_core_clk){
-
+//withClock(io.somnia_core_clk){
+withClock(clock){
 //////////////////////////////////////////////////////////////
 ///// parse input status signal                          /////
 //////////////////////////////////////////////////////////////

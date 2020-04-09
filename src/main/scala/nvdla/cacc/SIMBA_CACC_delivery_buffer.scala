@@ -49,15 +49,16 @@ class SOMNIA_CACC_delivery_buffer(implicit conf: somniaConfig) extends Module {
 //           └─┐  ┐  ┌───────┬──┐  ┌──┘         
 //             │ ─┤ ─┤       │ ─┤ ─┤         
 //             └──┴──┘       └──┴──┘ 
-withClock(io.somnia_core_clk){
-
+//withClock(io.somnia_core_clk){
+withClock(clock){
 // Instance RAMs 
 val data_left_mask = RegInit("b0".asUInt(conf.CACC_DWIDTH_DIV_PWIDTH.W))
 val dbuf_rd_en_new = ~(data_left_mask.orR) & io.dbuf_rd_addr.valid
 
 val u_accu_dbuf = Module(new nv_ram_rws(conf.CACC_DBUF_DEPTH, conf.CACC_DBUF_WIDTH))
 
-u_accu_dbuf.io.clk := io.somnia_core_clk
+//u_accu_dbuf.io.clk := io.somnia_core_clk
+u_accu_dbuf.io.clk := clock
 u_accu_dbuf.io.ra := io.dbuf_rd_addr.bits
 u_accu_dbuf.io.re := dbuf_rd_en_new
 u_accu_dbuf.io.we := io.dbuf_wr.addr.valid
