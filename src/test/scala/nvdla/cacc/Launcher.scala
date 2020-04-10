@@ -43,6 +43,24 @@ object caccLauncher {
         Driver.execute(() => new SOMNIA_CACC_delivery_ctrl, manager) {
           (c) => new SOMNIA_CACC_delivery_ctrl_Tests(c)
         }
+      },
+     "SOMNIA_CACC_dual_reg" -> { 
+        (manager: TesterOptionsManager) =>
+        Driver.execute(() => new SOMNIA_CACC_dual_reg, manager) {
+          (c) => new SOMNIA_CACC_dual_reg_Tests(c)
+        }
+      },
+     "SOMNIA_CACC_reg" -> { 
+        (manager: TesterOptionsManager) =>
+        Driver.execute(() => new SOMNIA_CACC_regfile, manager) {
+          (c) => new SOMNIA_CACC_regfile_Tests(c)
+        }
+      },
+     "SOMNIA_cacc" -> { 
+        (manager: TesterOptionsManager) =>
+        Driver.execute(() => new SOMNIA_cacc, manager) {
+          (c) => new SOMNIA_cacc_Tests(c)
+        }
       }
   )
   def main(args: Array[String]): Unit = {
