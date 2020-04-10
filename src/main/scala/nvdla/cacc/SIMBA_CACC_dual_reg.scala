@@ -41,8 +41,8 @@ class SOMNIA_CACC_dual_reg extends Module{
    //       └─┐  ┐  ┌───────┬──┐  ┌──┘
    //         │ ─┤ ─┤       │ ─┤ ─┤
    //         └──┴──┘       └──┴──┘
-   withClock(io.somnia_core_clk){
-
+   //withClock(io.somnia_core_clk){
+     withClock(clock){
    // Address decode
    val nvdla_cacc_d_batch_number_0_wren = (io.reg.offset === "h1c".asUInt(32.W)) & io.reg.wr_en
    val nvdla_cacc_d_clip_cfg_0_wren = (io.reg.offset === "h2c".asUInt(32.W)) & io.reg.wr_en

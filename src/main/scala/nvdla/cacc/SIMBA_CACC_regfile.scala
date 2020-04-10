@@ -47,8 +47,8 @@ class SOMNIA_CACC_regfile extends Module {
 //             │ ─┤ ─┤       │ ─┤ ─┤
 //             └──┴──┘       └──┴──┘
 
-withClock(io.somnia_core_clk){
-
+//withClock(io.somnia_core_clk){
+withClock(clock){
    //Instance single register group
    val dp2reg_consumer = RegInit(false.B)
    val dp2reg_status_0 = Wire(Bool())
@@ -60,7 +60,8 @@ withClock(io.somnia_core_clk){
 
    val u_single_reg = Module(new NV_NVDLA_BASIC_REG_single)
 
-   u_single_reg.io.nvdla_core_clk := io.somnia_core_clk
+   //u_single_reg.io.nvdla_core_clk := io.somnia_core_clk
+   u_single_reg.io.nvdla_core_clk := clock
    u_single_reg.io.reg.offset := reg_offset
    u_single_reg.io.reg.wr_data := reg_wr_data
    u_single_reg.io.reg.wr_en := s_reg_wr_en
@@ -76,7 +77,8 @@ withClock(io.somnia_core_clk){
    val dp2reg_d0_sat_count = RegInit("b0".asUInt(32.W))
 
    val u_dual_reg_d0 = Module(new SOMNIA_CACC_dual_reg)
-   u_dual_reg_d0.io.somnia_core_clk := io.somnia_core_clk
+   //u_dual_reg_d0.io.somnia_core_clk := io.somnia_core_clk
+   u_dual_reg_d0.io.somnia_core_clk := clock
    u_dual_reg_d0.io.reg.offset := reg_offset
    u_dual_reg_d0.io.reg.wr_data := reg_wr_data
    u_dual_reg_d0.io.reg.wr_en := d0_reg_wr_en
@@ -91,7 +93,8 @@ withClock(io.somnia_core_clk){
    val dp2reg_d1_sat_count = RegInit("b0".asUInt(32.W))
 
    val u_dual_reg_d1 = Module(new SOMNIA_CACC_dual_reg)
-   u_dual_reg_d1.io.somnia_core_clk := io.somnia_core_clk
+   //u_dual_reg_d1.io.somnia_core_clk := io.somnia_core_clk
+   u_dual_reg_d1.io.somnia_core_clk := clock
    u_dual_reg_d1.io.reg.offset := reg_offset
    u_dual_reg_d1.io.reg.wr_data := reg_wr_data
    u_dual_reg_d1.io.reg.wr_en := d1_reg_wr_en
@@ -171,7 +174,8 @@ withClock(io.somnia_core_clk){
    //                                                                    //
    ////////////////////////////////////////////////////////////////////////
    val csb_logic = Module(new NV_NVDLA_CSB_LOGIC)
-   csb_logic.io.clk := io.somnia_core_clk
+   //csb_logic.io.clk := io.somnia_core_clk
+   csb_logic.io.clk := clock
    csb_logic.io.csb2dp <> io.csb2cacc
    reg_offset := csb_logic.io.reg.offset
    reg_wr_en := csb_logic.io.reg.wr_en

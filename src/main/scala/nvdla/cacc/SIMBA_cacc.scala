@@ -58,7 +58,8 @@ withReset(!io.somnia_core_rstn){
     //==========================================================
     val u_regfile = Module(new SOMNIA_CACC_regfile)
 
-    u_regfile.io.somnia_core_clk := io.somnia_clock.somnia_core_clk  
+    //u_regfile.io.somnia_core_clk := io.somnia_clock.somnia_core_clk 
+    u_regfile.io.somnia_core_clk := clock
     u_regfile.io.csb2cacc <> io.csb2cacc   
          
     val field = u_regfile.io.reg2dp_field  
@@ -68,8 +69,8 @@ withReset(!io.somnia_core_rstn){
     //==========================================================
     val u_assembly_ctrl = Module(new SOMNIA_CACC_assembly_ctrl)
 
-    u_assembly_ctrl.io.somnia_core_clk := somnia_op_gated_clk(0) 
-
+    //u_assembly_ctrl.io.somnia_core_clk := somnia_op_gated_clk(0) 
+    u_assembly_ctrl.io.somnia_core_clk := clock
     u_assembly_ctrl.io.mac2accu_pd.valid := io.mac2accu.valid
     u_assembly_ctrl.io.mac2accu_pd.bits := io.mac2accu.bits.pd
     
@@ -82,7 +83,8 @@ withReset(!io.somnia_core_rstn){
     //==========================================================
     val u_assembly_buffer = Module(new SOMNIA_CACC_assembly_buffer)
     
-    u_assembly_buffer.io.somnia_core_clk := somnia_op_gated_clk(1)
+    //u_assembly_buffer.io.somnia_core_clk := somnia_op_gated_clk(1)
+    u_assembly_buffer.io.somnia_core_clk := clock
     u_assembly_buffer.io.pwrbus_ram_pd := io.pwrbus_ram_pd
 
     u_assembly_buffer.io.abuf_rd.addr.valid := u_assembly_ctrl.io.abuf_rd_addr.valid
@@ -93,8 +95,10 @@ withReset(!io.somnia_core_rstn){
     //==========================================================
     val u_calculator = Module(new SOMNIA_CACC_calculator)
 
-    u_calculator.io.somnia_cell_clk := somnia_cell_gated_clk
-    u_calculator.io.somnia_core_clk := somnia_op_gated_clk(2)
+    //u_calculator.io.somnia_cell_clk := somnia_cell_gated_clk
+    //u_calculator.io.somnia_core_clk := somnia_op_gated_clk(2)
+    u_calculator.io.somnia_cell_clk := clock
+    u_calculator.io.somnia_core_clk := clock
 
     u_calculator.io.abuf_rd_data := u_assembly_buffer.io.abuf_rd.data
     u_assembly_buffer.io.abuf_wr <> u_calculator.io.abuf_wr
@@ -117,8 +121,8 @@ withReset(!io.somnia_core_rstn){
     //==========================================================
     val u_delivery_ctrl = Module(new SOMNIA_CACC_delivery_ctrl)
 
-    u_delivery_ctrl.io.somnia_core_clk := io.somnia_clock.somnia_core_clk
-
+    //u_delivery_ctrl.io.somnia_core_clk := io.somnia_clock.somnia_core_clk
+    u_delivery_ctrl.io.somnia_core_clk := clock
     u_delivery_ctrl.io.dlv_data := u_calculator.io.dlv_data
     u_delivery_ctrl.io.dlv_mask := u_calculator.io.dlv_mask
     u_delivery_ctrl.io.dlv_pd := u_calculator.io.dlv_pd
@@ -135,7 +139,8 @@ withReset(!io.somnia_core_rstn){
 
     val u_delivery_buffer = Module(new SOMNIA_CACC_delivery_buffer)
 
-    u_delivery_buffer.io.somnia_core_clk := io.somnia_clock.somnia_core_clk
+    //u_delivery_buffer.io.somnia_core_clk := io.somnia_clock.somnia_core_clk
+    u_delivery_buffer.io.somnia_core_clk := clock
     u_delivery_buffer.io.pwrbus_ram_pd := io.pwrbus_ram_pd
 
 
