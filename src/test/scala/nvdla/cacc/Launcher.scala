@@ -61,6 +61,12 @@ object caccLauncher {
         Driver.execute(() => new SOMNIA_cacc, manager) {
           (c) => new SOMNIA_cacc_Tests(c)
         }
+      },
+     "SOMNIA_cacc2" -> { 
+        (manager: TesterOptionsManager) =>
+        Driver.execute(() => new SOMNIA_cacc, manager) {
+          (c) => new SOMNIA_cacc_Tests2(c)
+        }
       }
   )
   def main(args: Array[String]): Unit = {
