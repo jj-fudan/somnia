@@ -57,6 +57,12 @@ object cmacLauncher{
           (c) => new SOMNIA_CMAC_CORE_Tests(c)
         }
       },
+"SOMNIA_CMAC_core2" -> { 
+        (manager: TesterOptionsManager) =>
+        Driver.execute(() => new SOMNIA_CMAC_core(), manager) {
+          (c) => new SOMNIA_CMAC_CORE_Testss(c)
+        }
+      },
         "SOMNIA_CMAC_reg" -> { 
         (manager: TesterOptionsManager) =>
         Driver.execute(() => new SOMNIA_CMAC_reg(), manager) {

@@ -24,7 +24,7 @@ class SOMNIA_CMAC_REG_Tests(c:SOMNIA_CMAC_reg) extends PeekPokeTester(c){
   val req2 ="b000000001000000000000000000000000000000010000000000000000000010".U
   poke(c.io.csb2cmac_a.req.valid,true)
   poke(c.io.csb2cmac_a.req.bits,req2)
-  step(10)
+  step(5)
   val op_en = "b11111111111".asUInt(11.W)
   expect(c.io.slcg_op_en,op_en)
   

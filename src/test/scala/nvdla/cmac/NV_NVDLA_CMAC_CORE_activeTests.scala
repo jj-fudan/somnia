@@ -6,90 +6,448 @@ import chisel3.iotesters.{PeekPokeTester, Driver, ChiselFlatSpec}
 class SOMNIA_CMAC_CORE_activeTests(c: SOMNIA_CMAC_CORE_active) extends PeekPokeTester(c) {
  
   implicit val conf: somniaConfig = new somniaConfig
-
-//==========================================================
-//test dat data forwading 
-//==========================================================  
-
-  for (t <- 0 until 100) {
-
-    //input_dat 
-    val in_dat_data = Array.fill(conf.CMAC_ATOMC){0}
-    val in_dat_mask = Array.fill(conf.CMAC_ATOMC){false}
-    val in_dat_pvld = rnd.nextBoolean()
-    val in_dat_stripe_st = false
-    val in_dat_stripe_end = false
-
-    //input_wt
-    val in_wt_data = Array.fill(conf.CMAC_ATOMC){0}
-    val in_wt_mask = Array.fill(conf.CMAC_ATOMC){false}
-    val in_wt_pvld = rnd.nextBoolean()
-    val in_wt_sel = Array.fill(conf.CMAC_ATOMK){false}
-
-    //assign st, end, pvld
-    poke(c.io.in_dat.valid, in_dat_pvld)
-    poke(c.io.in_wt.valid, in_wt_pvld)
-
-    poke(c.io.in_dat_stripe_st, in_dat_stripe_st)
-    poke(c.io.in_dat_stripe_end, in_dat_stripe_end)    
-
-    //assign data, mask
-    for (i <- 0 until conf.CMAC_ATOMC){
-
-      in_dat_data(i) = rnd.nextInt(1<<conf.CMAC_BPE)
-      in_dat_mask(i) = rnd.nextBoolean()
-
-      in_wt_data(i) = rnd.nextInt(1<<conf.CMAC_BPE)
-      in_wt_mask(i) = rnd.nextBoolean()
-
-      poke(c.io.in_dat.bits.data(i), in_dat_data(i))
-      poke(c.io.in_dat.bits.mask(i), in_dat_mask(i))
-
-      poke(c.io.in_wt.bits.data(i), in_wt_data(i))
-      poke(c.io.in_wt.bits.mask(i), in_wt_mask(i))
-
-    }
-
-    //assign wt sel
-    for(i <- 0 until conf.CMAC_ATOMK){
-
-      in_wt_sel(i) = rnd.nextBoolean()
-
-      poke(c.io.in_wt.bits.sel(i), in_wt_sel(i))
-
-    }
-
-    step(2)
-
-    //check stripe st/end
-    expect(c.io.in_dat_stripe_st, in_dat_stripe_st)
-    expect(c.io.in_dat_stripe_end, in_dat_stripe_end)
-
-    //check dat valid
-    for(i <- 0 until conf.CMAC_ATOMK){
-        for(j <- 0 until conf.CMAC_ATOMC){
-          expect(c.io.dat_actv(i)(j).valid, in_dat_pvld)
-      }
-    }
-
-    //check that dat pack
-    if(in_dat_pvld){
-      for(i <- 0 until conf.CMAC_ATOMK){
-          for(j <- 0 until conf.CMAC_ATOMC){
-            expect(c.io.dat_actv(i)(j).bits.nz, in_dat_mask(j))
-            if(in_dat_mask(j)){
-              expect(c.io.dat_actv(i)(j).bits.data, in_dat_data(j))
-            }
-          }       
-       }
-    }
-
-
-//==========================================================
-//test wt data forwading 
-//==========================================================  
-
+  poke(c.io.in_wt.valid,true)
+  for( i <- 0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_wt.bits.mask(i),true)
+  if(i == 0){
+  poke(c.io.in_wt.bits.data(i),1)
+  poke(c.io.in_wt.bits.sel(i),1)}
+  else{
+  poke(c.io.in_wt.bits.data(i),0) 
+  poke(c.io.in_wt.bits.sel(i),0)}
   }
+  step(1)
+  
+  poke(c.io.in_wt.valid,true)
+  for( i <- 0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_wt.bits.mask(i),true)
+  if(i == 0)
+  poke(c.io.in_wt.bits.data(i),2)
+  else
+  poke(c.io.in_wt.bits.data(i),0) 
+  if(i == 1)
+  poke(c.io.in_wt.bits.sel(i),1)
+  else
+  poke(c.io.in_wt.bits.sel(i),0)
+  }
+  step(1)
+
+  poke(c.io.in_wt.valid,true)
+  for( i <- 0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_wt.bits.mask(i),true)
+  if(i == 0)
+  poke(c.io.in_wt.bits.data(i),3)
+  else
+  poke(c.io.in_wt.bits.data(i),0) 
+  if(i == 2)
+  poke(c.io.in_wt.bits.sel(i),1)
+  else
+  poke(c.io.in_wt.bits.sel(i),0)
+  }
+  step(1)
+
+  poke(c.io.in_wt.valid,true)
+  for( i <- 0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_wt.bits.mask(i),true)
+  if(i == 0)
+  poke(c.io.in_wt.bits.data(i),4)
+  else
+  poke(c.io.in_wt.bits.data(i),0) 
+  if(i == 3)
+  poke(c.io.in_wt.bits.sel(i),1)
+  else
+  poke(c.io.in_wt.bits.sel(i),0)
+  }
+  step(1)
+  
+  poke(c.io.in_wt.valid,true)
+  for( i <- 0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_wt.bits.mask(i),true)
+  if(i == 0)
+  poke(c.io.in_wt.bits.data(i),5)
+  else
+  poke(c.io.in_wt.bits.data(i),0) 
+  if(i == 4)
+  poke(c.io.in_wt.bits.sel(i),1)
+  else
+  poke(c.io.in_wt.bits.sel(i),0)
+  }
+  step(1)
+
+  poke(c.io.in_wt.valid,true)
+  for( i <- 0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_wt.bits.mask(i),true)
+  if(i == 0)
+  poke(c.io.in_wt.bits.data(i),6)
+  else
+  poke(c.io.in_wt.bits.data(i),0) 
+  if(i == 5)
+  poke(c.io.in_wt.bits.sel(i),1)
+  else
+  poke(c.io.in_wt.bits.sel(i),0)
+  }
+  step(1)
+
+  poke(c.io.in_wt.valid,true)
+  for( i <- 0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_wt.bits.mask(i),true)
+  if(i == 0)
+  poke(c.io.in_wt.bits.data(i),7)
+  else
+  poke(c.io.in_wt.bits.data(i),0) 
+  if(i ==6)
+  poke(c.io.in_wt.bits.sel(i),1)
+  else
+  poke(c.io.in_wt.bits.sel(i),0)
+  }
+  step(1)
+   
+  poke(c.io.in_wt.valid,true)
+  for( i <- 0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_wt.bits.mask(i),true)
+  if(i == 0)
+  poke(c.io.in_wt.bits.data(i),8)
+  else
+  poke(c.io.in_wt.bits.data(i),0) 
+  if(i == 7)
+  poke(c.io.in_wt.bits.sel(i),1)
+  else
+  poke(c.io.in_wt.bits.sel(i),0)
+  }//wt1 ok
+  step(1)
+
+  poke(c.io.in_wt.valid,true)
+  for( i <- 0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_wt.bits.mask(i),true)
+  if(i == 0){
+  poke(c.io.in_wt.bits.data(i),9)
+  poke(c.io.in_wt.bits.sel(i),1)}
+  else{
+  poke(c.io.in_wt.bits.data(i),0) 
+  poke(c.io.in_wt.bits.sel(i),0)}
+  }//wt2 st
+  //dat1 st
+  poke(c.io.in_dat.valid,true)
+  poke(c.io.in_dat_stripe_st,true)
+  poke(c.io.in_dat_stripe_end,false)
+  for(i<-0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_dat.bits.mask(i),true)
+  if(i==0)
+  poke(c.io.in_dat.bits.data(i),1)
+  else
+  poke(c.io.in_dat.bits.data(i),0)
+  }
+  step(1)
+
+  poke(c.io.in_wt.valid,true)
+  for( i <- 0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_wt.bits.mask(i),true)
+  if(i == 0)
+  poke(c.io.in_wt.bits.data(i),10)
+  else
+  poke(c.io.in_wt.bits.data(i),0) 
+  if(i == 1)
+  poke(c.io.in_wt.bits.sel(i),1)
+  else
+  poke(c.io.in_wt.bits.sel(i),0)
+  }
+  poke(c.io.in_dat.valid,true)
+  poke(c.io.in_dat_stripe_st,false)
+  poke(c.io.in_dat_stripe_end,false)
+  for(i<-0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_dat.bits.mask(i),true)
+  if(i==0)
+  poke(c.io.in_dat.bits.data(i),1)
+  else
+  poke(c.io.in_dat.bits.data(i),0)
+  }
+  step(1)
+
+  for(i <- 0 to conf.CMAC_ATOMK-1)
+     for(j <- 0 to conf.CMAC_ATOMK-1){
+       expect(c.io.dat_actv(i)(j).valid,true)
+       expect(c.io.wt_actv(i)(j).valid,true)
+       expect(c.io.dat_actv(i)(j).bits.nz,true)
+       expect(c.io.wt_actv(i)(j).bits.nz,true)
+       if(j==0){
+          expect(c.io.dat_actv(i)(j).bits.data,1)
+          expect(c.io.wt_actv(i)(j).bits.data,i+1)
+          }
+     }
+  poke(c.io.in_wt.valid,true)
+  for( i <- 0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_wt.bits.mask(i),true)
+  if(i == 0)
+  poke(c.io.in_wt.bits.data(i),11)
+  else
+  poke(c.io.in_wt.bits.data(i),0) 
+  if(i == 2)
+  poke(c.io.in_wt.bits.sel(i),1)
+  else
+  poke(c.io.in_wt.bits.sel(i),0)
+  }
+  poke(c.io.in_dat.valid,true)
+  poke(c.io.in_dat_stripe_st,false)
+  poke(c.io.in_dat_stripe_end,false)
+  for(i<-0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_dat.bits.mask(i),true)
+  if(i==0)
+  poke(c.io.in_dat.bits.data(i),1)
+  else
+  poke(c.io.in_dat.bits.data(i),0)
+  }
+  step(1)
+
+  poke(c.io.in_wt.valid,true)
+  for( i <- 0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_wt.bits.mask(i),true)
+  if(i == 0)
+  poke(c.io.in_wt.bits.data(i),12)
+  else
+  poke(c.io.in_wt.bits.data(i),0) 
+  if(i == 3)
+  poke(c.io.in_wt.bits.sel(i),1)
+  else
+  poke(c.io.in_wt.bits.sel(i),0)
+  }
+  poke(c.io.in_dat.valid,true)
+  poke(c.io.in_dat_stripe_st,false)
+  poke(c.io.in_dat_stripe_end,false)
+  for(i<-0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_dat.bits.mask(i),true)
+  if(i==0)
+  poke(c.io.in_dat.bits.data(i),1)
+  else
+  poke(c.io.in_dat.bits.data(i),0)
+  }
+  step(1)
+  
+  poke(c.io.in_wt.valid,true)
+  for( i <- 0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_wt.bits.mask(i),true)
+  if(i == 0)
+  poke(c.io.in_wt.bits.data(i),13)
+  else
+  poke(c.io.in_wt.bits.data(i),0) 
+  if(i == 4)
+  poke(c.io.in_wt.bits.sel(i),1)
+  else
+  poke(c.io.in_wt.bits.sel(i),0)
+  }
+  poke(c.io.in_dat.valid,true)
+  poke(c.io.in_dat_stripe_st,false)
+  poke(c.io.in_dat_stripe_end,false)
+  for(i<-0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_dat.bits.mask(i),true)
+  if(i==0)
+  poke(c.io.in_dat.bits.data(i),1)
+  else
+  poke(c.io.in_dat.bits.data(i),0)
+  }
+  step(1)
+
+  poke(c.io.in_wt.valid,true)
+  for( i <- 0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_wt.bits.mask(i),true)
+  if(i == 0)
+  poke(c.io.in_wt.bits.data(i),14)
+  else
+  poke(c.io.in_wt.bits.data(i),0) 
+  if(i == 5)
+  poke(c.io.in_wt.bits.sel(i),1)
+  else
+  poke(c.io.in_wt.bits.sel(i),0)
+  }
+  poke(c.io.in_dat.valid,true)
+  poke(c.io.in_dat_stripe_st,false)
+  poke(c.io.in_dat_stripe_end,false)
+  for(i<-0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_dat.bits.mask(i),true)
+  if(i==0)
+  poke(c.io.in_dat.bits.data(i),1)
+  else
+  poke(c.io.in_dat.bits.data(i),0)
+  }
+  step(1)
+
+  poke(c.io.in_wt.valid,true)
+  for( i <- 0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_wt.bits.mask(i),true)
+  if(i == 0)
+  poke(c.io.in_wt.bits.data(i),15)
+  else
+  poke(c.io.in_wt.bits.data(i),0) 
+  if(i ==6)
+  poke(c.io.in_wt.bits.sel(i),1)
+  else
+  poke(c.io.in_wt.bits.sel(i),0)
+  }
+  poke(c.io.in_dat.valid,true)
+  poke(c.io.in_dat_stripe_st,false)
+  poke(c.io.in_dat_stripe_end,false)
+  for(i<-0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_dat.bits.mask(i),true)
+  if(i==0)
+  poke(c.io.in_dat.bits.data(i),1)
+  else
+  poke(c.io.in_dat.bits.data(i),0)
+  }
+  step(1)
+   
+  poke(c.io.in_wt.valid,true)
+  for( i <- 0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_wt.bits.mask(i),true)
+  if(i == 0)
+  poke(c.io.in_wt.bits.data(i),16)
+  else
+  poke(c.io.in_wt.bits.data(i),0) 
+  if(i == 7)
+  poke(c.io.in_wt.bits.sel(i),1)
+  else
+  poke(c.io.in_wt.bits.sel(i),0)
+  }
+  poke(c.io.in_dat.valid,true)
+  poke(c.io.in_dat_stripe_st,false)
+  poke(c.io.in_dat_stripe_end,true)
+  for(i<-0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_dat.bits.mask(i),true)
+  if(i==0)
+  poke(c.io.in_dat.bits.data(i),1)
+  else
+  poke(c.io.in_dat.bits.data(i),0)
+  }
+  step(1)
+  
+  poke(c.io.in_wt.valid,false)//wt2 ok 
+  poke(c.io.in_dat.valid,true)
+  poke(c.io.in_dat_stripe_st,true)
+  poke(c.io.in_dat_stripe_end,false)
+  for(i<-0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_dat.bits.mask(i),true)
+  if(i==0)
+  poke(c.io.in_dat.bits.data(i),1)
+  else
+  poke(c.io.in_dat.bits.data(i),0)
+  }
+  step(1)
+
+  poke(c.io.in_dat.valid,true)
+  poke(c.io.in_dat_stripe_st,false)
+  poke(c.io.in_dat_stripe_end,false)
+  for(i<-0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_dat.bits.mask(i),true)
+  if(i==0)
+  poke(c.io.in_dat.bits.data(i),1)
+  else
+  poke(c.io.in_dat.bits.data(i),0)
+  }
+  step(1)
+
+   for(i <- 0 to conf.CMAC_ATOMK-1)
+     for(j <- 0 to conf.CMAC_ATOMK-1){
+       expect(c.io.dat_actv(i)(j).valid,true)
+       expect(c.io.wt_actv(i)(j).valid,true)
+       expect(c.io.dat_actv(i)(j).bits.nz,true)
+       expect(c.io.wt_actv(i)(j).bits.nz,true)
+       if(j==0){
+          expect(c.io.dat_actv(i)(j).bits.data,1)
+          expect(c.io.wt_actv(i)(j).bits.data,i+9)
+          }
+     }
+ 
+  poke(c.io.in_dat.valid,true)
+  poke(c.io.in_dat_stripe_st,false)
+  poke(c.io.in_dat_stripe_end,false)
+  for(i<-0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_dat.bits.mask(i),true)
+  if(i==0)
+  poke(c.io.in_dat.bits.data(i),1)
+  else
+  poke(c.io.in_dat.bits.data(i),0)
+  }
+  step(1)
+
+  poke(c.io.in_dat.valid,true)
+  poke(c.io.in_dat_stripe_st,false)
+  poke(c.io.in_dat_stripe_end,false)
+  for(i<-0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_dat.bits.mask(i),true)
+  if(i==0)
+  poke(c.io.in_dat.bits.data(i),1)
+  else
+  poke(c.io.in_dat.bits.data(i),0)
+  }
+  step(1)
+  
+  poke(c.io.in_dat.valid,true)
+  poke(c.io.in_dat_stripe_st,false)
+  poke(c.io.in_dat_stripe_end,false)
+  for(i<-0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_dat.bits.mask(i),true)
+  if(i==0)
+  poke(c.io.in_dat.bits.data(i),1)
+  else
+  poke(c.io.in_dat.bits.data(i),0)
+  }
+  step(1)
+
+  poke(c.io.in_dat.valid,true)
+  poke(c.io.in_dat_stripe_st,false)
+  poke(c.io.in_dat_stripe_end,false)
+  for(i<-0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_dat.bits.mask(i),true)
+  if(i==0)
+  poke(c.io.in_dat.bits.data(i),1)
+  else
+  poke(c.io.in_dat.bits.data(i),0)
+  }
+  step(1)
+
+  poke(c.io.in_dat.valid,true)
+  poke(c.io.in_dat_stripe_st,false)
+  poke(c.io.in_dat_stripe_end,false)
+  for(i<-0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_dat.bits.mask(i),true)
+  if(i==0)
+  poke(c.io.in_dat.bits.data(i),1)
+  else
+  poke(c.io.in_dat.bits.data(i),0)
+  }
+  step(1)
+
+  poke(c.io.in_dat.valid,true)
+  poke(c.io.in_dat_stripe_st,false)
+  poke(c.io.in_dat_stripe_end,true)
+  for(i<-0 to conf.CMAC_ATOMK-1){
+  poke(c.io.in_dat.bits.mask(i),true)
+  if(i==0)
+  poke(c.io.in_dat.bits.data(i),1)
+  else
+  poke(c.io.in_dat.bits.data(i),0)
+  }
+  step(1)
+  poke(c.io.in_dat.valid,false)
+  poke(c.io.in_dat_stripe_st,false)
+  poke(c.io.in_dat_stripe_end,false)
+  step(1)
+  for(i <- 0 to conf.CMAC_ATOMK-1)
+     for(j <- 0 to conf.CMAC_ATOMK-1){
+       expect(c.io.dat_actv(i)(j).valid,true)
+       expect(c.io.wt_actv(i)(j).valid,true)
+       expect(c.io.dat_actv(i)(j).bits.nz,true)
+       expect(c.io.wt_actv(i)(j).bits.nz,true)
+       if(j==0){
+          expect(c.io.dat_actv(i)(j).bits.data,1)
+          expect(c.io.wt_actv(i)(j).bits.data,i+9)
+          }
+     }
+  step(1)
+   for(i <- 0 to conf.CMAC_ATOMK-1){
+        for (j <- 0 to conf.CMAC_ATOMC-1){
+        expect(c.io.dat_actv(i)(j).valid,false)
+        expect(c.io.wt_actv(i)(j).valid,false)
+        }
+   }
 }
 
 class NV_NVDLA_CMAC_CORE_activeTester extends ChiselFlatSpec {

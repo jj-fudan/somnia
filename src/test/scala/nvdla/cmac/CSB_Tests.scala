@@ -5,13 +5,13 @@ import chisel3.iotesters.{ChiselFlatSpec, Driver, PeekPokeTester}
 import chisel3.util._
 
 class SOMNIA_CSB_Tests(c:NV_NVDLA_CSB_LOGIC) extends PeekPokeTester(c){
-  val req2 = "b000000001000000000000000000000000000000010000000000000000000010".U
+  val req2 = "b000000001000000000000000000000000000010000000000000000000001011".U
   poke(c.io.csb2dp.req.valid,true)
   poke(c.io.csb2dp.req.bits,req2)
-  step(10)
-  expect(c.io.reg.offset,8)
+  step(1)
+  expect(c.io.reg.offset,"h2c".U)
   expect(c.io.reg.wr_en,true)
-  expect(c.io.reg.wr_data,1)
+  expect(c.io.reg.wr_data,8)
   
 }
 
