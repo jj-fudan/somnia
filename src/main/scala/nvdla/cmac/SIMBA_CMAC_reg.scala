@@ -45,8 +45,8 @@ class SOMNIA_CMAC_reg(implicit val conf: somniaConfig) extends Module {
 //             └──┴──┘       └──┴──┘ 
 
     
-withClock(io.somnia_core_clk){
-//withClock(clock){
+//withClock(io.somnia_core_clk){
+withClock(clock){
 
     //Instance single register group
     val dp2reg_consumer = RegInit(false.B)
@@ -57,7 +57,7 @@ withClock(io.somnia_core_clk){
     val reg_wr_data = Wire(UInt(32.W))
     val s_reg_wr_en = Wire(Bool())
 
-    val u_single_reg = Module(new NV_NVDLA_BASIC_REG_single(useRealClock = true))
+    val u_single_reg = Module(new NV_NVDLA_BASIC_REG_single(useRealClock = false))
 
     u_single_reg.io.nvdla_core_clk := io.somnia_core_clk
     u_single_reg.io.reg.offset := reg_offset
@@ -73,7 +73,7 @@ withClock(io.somnia_core_clk){
     val d0_reg_wr_en = Wire(Bool())
     val reg2dp_d0_op_en = RegInit(false.B)
 
-    val u_dual_reg_d0 = Module(new SOMNIA_CMAC_REG_dual(useRealClock = true))
+    val u_dual_reg_d0 = Module(new SOMNIA_CMAC_REG_dual(useRealClock = false))
     u_dual_reg_d0.io.somnia_core_clk := io.somnia_core_clk
     u_dual_reg_d0.io.reg.offset := reg_offset
     u_dual_reg_d0.io.reg.wr_data := reg_wr_data
@@ -86,7 +86,7 @@ withClock(io.somnia_core_clk){
     val d1_reg_wr_en = Wire(Bool())
     val reg2dp_d1_op_en = RegInit(false.B)
 
-    val u_dual_reg_d1 = Module(new SOMNIA_CMAC_REG_dual(useRealClock = true))
+    val u_dual_reg_d1 = Module(new SOMNIA_CMAC_REG_dual(useRealClock = false))
     u_dual_reg_d1.io.somnia_core_clk := io.somnia_core_clk
     u_dual_reg_d1.io.reg.offset := reg_offset
     u_dual_reg_d1.io.reg.wr_data := reg_wr_data
@@ -162,8 +162,8 @@ withClock(io.somnia_core_clk){
     //                                                                    //
     ////////////////////////////////////////////////////////////////////////
     val csb_logic = Module(new NV_NVDLA_CSB_LOGIC)
-    //csb_logic.io.clk := clock
-    csb_logic.io.clk := io.somnia_core_clk
+    csb_logic.io.clk := clock
+    //csb_logic.io.clk := io.somnia_core_clk
     csb_logic.io.csb2dp <> io.csb2cmac_a
     reg_offset := csb_logic.io.reg.offset
     reg_wr_en := csb_logic.io.reg.wr_en

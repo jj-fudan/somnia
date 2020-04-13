@@ -42,8 +42,8 @@ class SOMNIA_CMAC_CORE_rt_in(useRealClock:Boolean = true)(implicit val conf: som
 //             │ ─┤ ─┤       │ ─┤ ─┤         
 //             └──┴──┘       └──┴──┘ 
     
-    withClock(io.somnia_core_clk){
-    //withClock(clock){
+    //withClock(io.somnia_core_clk){
+    withClock(clock){
     // retiming init
 
     val in_rt_dat_data_d = retiming(Vec(conf.CMAC_ATOMC, UInt(conf.CMAC_BPE.W)), conf.CMAC_IN_RT_LATENCY)

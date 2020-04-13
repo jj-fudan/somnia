@@ -62,8 +62,8 @@ class SOMNIA_CMAC_CORE_mac(useRealClock:Boolean = false)(implicit conf: somniaCo
     //add retiming
     val pp_pvld_d0 = io.dat_actv(0).valid&io.wt_actv(0).valid
 
-    io.mac_out.bits := ShiftRegister(sum_out, conf.CMAC_OUT_RETIMING, pp_pvld_d0)
-    io.mac_out.valid := ShiftRegister(pp_pvld_d0, conf.CMAC_OUT_RETIMING, pp_pvld_d0)
+    io.mac_out.bits := ShiftRegister(sum_out, conf.CMAC_OUT_RETIMING)
+    io.mac_out.valid := ShiftRegister(pp_pvld_d0, conf.CMAC_OUT_RETIMING)
 
     }
 
