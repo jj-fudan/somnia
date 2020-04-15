@@ -22,7 +22,8 @@ class nv_ram_rws(dep: Int, wid: Int) extends Module{
         val di = Input(UInt(wid.W))
         val dout = Output(UInt(wid.W))
     })
- withClock(io.clk){
+ //withClock(io.clk){
+   withClock(clock){
     // Create a synchronous-read, synchronous-write memory (like in FPGAs).
     val mem = SyncReadMem(dep, UInt(wid.W))
     // Create one write port and one read port.

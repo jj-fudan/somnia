@@ -36,7 +36,8 @@ class NV_NVDLA_CSB_LOGIC(io_reg_rd_en:Boolean = false) extends Module {
     //           └─┐  ┐  ┌───────┬──┐  ┌──┘         
     //             │ ─┤ ─┤       │ ─┤ ─┤         
     //             └──┴──┘       └──┴──┘  
-withClock(io.clk){   
+//withClock(io.clk){ 
+withClock(clock){  
     ////////////////////////////////////////////////////////////////////////
     //                                                                    //
     // GENERATE CSB TO REGISTER CONNECTION LOGIC                          //
