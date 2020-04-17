@@ -12,7 +12,7 @@ object convLauncher {
         Driver.execute(() => new SOMNIA_convolution, manager) {
           (c) => new SOMNIA_convolution_Tests(c)
         }
-      }
+      },
  )
   def main(args: Array[String]): Unit = {
     TutorialRunner("conv", conv, args)

@@ -14,8 +14,8 @@
 
     //assembly buffer
      val CACC_ABUF_WIDTH = CACC_PARSUM_WIDTH*CACC_ATOMK
-     val CACC_ABUF_DEPTH = PE_MAC_ATOMIC_K_SIZE*2 //2*atomK, to store two slots of result.
-     val CACC_ABUF_AWIDTH  = PE_MAC_ATOMIC_K_SIZE_LOG2+1   //log2(abuf_depth)
+     val CACC_ABUF_DEPTH = PE_MAC_ATOMIC_K_SIZE //2*atomK, to store two slots of result.
+     val CACC_ABUF_AWIDTH  = PE_MAC_ATOMIC_K_SIZE_LOG2   //log2(abuf_depth)
 
     //delivery buffer
      val CACC_DBUF_WIDTH = CACC_FINAL_WIDTH*CACC_ATOMK

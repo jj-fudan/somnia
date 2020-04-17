@@ -12,8 +12,8 @@ class SOMNIA_CACC_CALC_int8 extends Module {
         val somnia_core_clk = Input(Clock())
 
         //input
-        //val in_data = Input(UInt(22.W))
-        val in_data = Input(UInt(19.W))
+        val in_data = Input(UInt(22.W))
+        //val in_data = Input(UInt(19.W))
         val in_op = Input(UInt(34.W))
         val in_op_valid = Input(Bool())   
         val in_sel = Input(Bool())

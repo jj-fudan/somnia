@@ -6,25 +6,32 @@ import chisel3.util._
 
 class SOMNIA_convolution_Tests (c:SOMNIA_convolution) extends PeekPokeTester(c){
   implicit val conf: somniaConfig = new somniaConfig
+  import scala.util.Random
+for(i <-0 to 100){
+  val wt1 =Array.ofDim[Int](8,8)
+  val wt2 =Array.ofDim[Int](8,8)
+  val dat1 = Array.ofDim[Int](8,8)
+  val dat2 = Array.ofDim[Int](8,8)
+  for (i <-0 to 7)
+    for (j <-0 to 7){
+    wt1(i)(j)=Random.nextInt(128)
+    wt2(i)(j)=Random.nextInt(128)
+    dat1(i)(j)=Random.nextInt(128)
+    dat2(i)(j)=Random.nextInt(128) 
+    }
   poke(c.io.somnia_core_rstn,true)
-  //val req ="b000000001000000000000000000000000000000010000000000000000000010".U
- // poke(c.io.csb2cmac_a.req.valid,true)
- // poke(c.io.csb2cmac_a.req.bits,req)
- // step(3)
   poke(c.io.csb2cacc.req.valid,true)
-  poke(c.io.cacc2ppu_pd.ready,true)
+  poke(c.io.cacc2ppu_pd_ready,false)
   poke(c.io.somnia_core_rstn,true)//no reset
   poke(c.io.csb2cacc.req.bits,"b000000001000000000000000000000000000000000000000000000000001011".U)
   step(1)//truncate=0
-  poke(c.io.csb2cacc.req.bits,"b000000001000000000000000000000000000000010000000000000000011011".U)
-  step(1)//bypass =1
+  poke(c.io.csb2cacc.req.bits,"b000000001000000000000000000000000000000010000000000000000011011".U)//bypass =1
+  step(1)
+  poke(c.io.csb2cacc.req.bits,"b000000001000000000000000000000000000000010000000000000000000010".U)
   poke(c.io.sc2mac_wt.valid,true)
   for( i <- 0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_wt.bits.mask(i),true)
-  if(i == 0)
-  poke(c.io.sc2mac_wt.bits.data(i),1)
-  else
-  poke(c.io.sc2mac_wt.bits.data(i),0) 
+  poke(c.io.sc2mac_wt.bits.data(i),wt1(0)(i))
   if(i == 0)
   poke(c.io.sc2mac_wt.bits.sel(i),1)
   else
@@ -35,10 +42,7 @@ class SOMNIA_convolution_Tests (c:SOMNIA_convolution) extends PeekPokeTester(c){
   poke(c.io.sc2mac_wt.valid,true)
   for( i <- 0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_wt.bits.mask(i),true)
-  if(i == 0)
-  poke(c.io.sc2mac_wt.bits.data(i),2)
-  else
-  poke(c.io.sc2mac_wt.bits.data(i),0) 
+  poke(c.io.sc2mac_wt.bits.data(i),wt1(1)(i)) 
   if(i == 1)
   poke(c.io.sc2mac_wt.bits.sel(i),1)
   else
@@ -49,10 +53,7 @@ class SOMNIA_convolution_Tests (c:SOMNIA_convolution) extends PeekPokeTester(c){
   poke(c.io.sc2mac_wt.valid,true)
   for( i <- 0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_wt.bits.mask(i),true)
-  if(i == 0)
-  poke(c.io.sc2mac_wt.bits.data(i),3)
-  else
-  poke(c.io.sc2mac_wt.bits.data(i),0) 
+  poke(c.io.sc2mac_wt.bits.data(i),wt1(2)(i))
   if(i == 2)
   poke(c.io.sc2mac_wt.bits.sel(i),1)
   else
@@ -63,10 +64,7 @@ class SOMNIA_convolution_Tests (c:SOMNIA_convolution) extends PeekPokeTester(c){
   poke(c.io.sc2mac_wt.valid,true)
   for( i <- 0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_wt.bits.mask(i),true)
-  if(i == 0)
-  poke(c.io.sc2mac_wt.bits.data(i),4)
-  else
-  poke(c.io.sc2mac_wt.bits.data(i),0) 
+  poke(c.io.sc2mac_wt.bits.data(i),wt1(3)(i))
   if(i == 3)
   poke(c.io.sc2mac_wt.bits.sel(i),1)
   else
@@ -77,10 +75,7 @@ class SOMNIA_convolution_Tests (c:SOMNIA_convolution) extends PeekPokeTester(c){
   poke(c.io.sc2mac_wt.valid,true)
   for( i <- 0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_wt.bits.mask(i),true)
-  if(i == 0)
-  poke(c.io.sc2mac_wt.bits.data(i),5)
-  else
-  poke(c.io.sc2mac_wt.bits.data(i),0) 
+  poke(c.io.sc2mac_wt.bits.data(i),wt1(4)(i))
   if(i == 4)
   poke(c.io.sc2mac_wt.bits.sel(i),1)
   else
@@ -91,10 +86,7 @@ class SOMNIA_convolution_Tests (c:SOMNIA_convolution) extends PeekPokeTester(c){
   poke(c.io.sc2mac_wt.valid,true)
   for( i <- 0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_wt.bits.mask(i),true)
-  if(i == 0)
-  poke(c.io.sc2mac_wt.bits.data(i),6)
-  else
-  poke(c.io.sc2mac_wt.bits.data(i),0) 
+  poke(c.io.sc2mac_wt.bits.data(i),wt1(5)(i))
   if(i == 5)
   poke(c.io.sc2mac_wt.bits.sel(i),1)
   else
@@ -105,10 +97,7 @@ class SOMNIA_convolution_Tests (c:SOMNIA_convolution) extends PeekPokeTester(c){
   poke(c.io.sc2mac_wt.valid,true)
   for( i <- 0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_wt.bits.mask(i),true)
-  if(i == 0)
-  poke(c.io.sc2mac_wt.bits.data(i),7)
-  else
-  poke(c.io.sc2mac_wt.bits.data(i),0) 
+  poke(c.io.sc2mac_wt.bits.data(i),wt1(6)(i))
   if(i == 6)
   poke(c.io.sc2mac_wt.bits.sel(i),1)
   else
@@ -119,10 +108,7 @@ class SOMNIA_convolution_Tests (c:SOMNIA_convolution) extends PeekPokeTester(c){
   poke(c.io.sc2mac_wt.valid,true)
   for( i <- 0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_wt.bits.mask(i),true)
-  if(i == 0)
-  poke(c.io.sc2mac_wt.bits.data(i),8)
-  else
-  poke(c.io.sc2mac_wt.bits.data(i),0) 
+  poke(c.io.sc2mac_wt.bits.data(i),wt1(7)(i))
   if(i == 7)
   poke(c.io.sc2mac_wt.bits.sel(i),1)
   else
@@ -133,10 +119,7 @@ class SOMNIA_convolution_Tests (c:SOMNIA_convolution) extends PeekPokeTester(c){
   poke(c.io.sc2mac_wt.valid,true)
   for( i <- 0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_wt.bits.mask(i),true)
-  if(i == 0)
-  poke(c.io.sc2mac_wt.bits.data(i),9)
-  else
-  poke(c.io.sc2mac_wt.bits.data(i),0) 
+  poke(c.io.sc2mac_wt.bits.data(i),wt2(0)(i))
   if(i == 0)
   poke(c.io.sc2mac_wt.bits.sel(i),1)
   else
@@ -147,21 +130,15 @@ class SOMNIA_convolution_Tests (c:SOMNIA_convolution) extends PeekPokeTester(c){
   poke(c.io.sc2mac_dat.bits.pd,"b000100000".U)
   for(i<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(i),true)
-  if(i==0)
-  poke(c.io.sc2mac_dat.bits.data(i),1)
-  else
-  poke(c.io.sc2mac_dat.bits.data(i),0)
+  poke(c.io.sc2mac_dat.bits.data(i),dat1(0)(i))
   }
-poke(c.io.csb2cacc.req.bits,"b000000001000000000000000000000000000000010000000000000000000010".U)
+
   step(1)//9
 
   poke(c.io.sc2mac_wt.valid,true)
   for( i <- 0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_wt.bits.mask(i),true)
-  if(i == 0)
-  poke(c.io.sc2mac_wt.bits.data(i),10)
-  else
-  poke(c.io.sc2mac_wt.bits.data(i),0) 
+  poke(c.io.sc2mac_wt.bits.data(i),wt2(1)(i))
   if(i == 1)
   poke(c.io.sc2mac_wt.bits.sel(i),1)
   else
@@ -171,20 +148,15 @@ poke(c.io.csb2cacc.req.bits,"b00000000100000000000000000000000000000001000000000
   poke(c.io.sc2mac_dat.bits.pd,"b000000000".U)
   for(i<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(i),true)
-  if(i==0)
-  poke(c.io.sc2mac_dat.bits.data(i),1)
-  else
-  poke(c.io.sc2mac_dat.bits.data(i),0)
+  poke(c.io.sc2mac_dat.bits.data(i),dat1(1)(i))
+
   }
   step(1)//10
 
   poke(c.io.sc2mac_wt.valid,true)
   for( i <- 0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_wt.bits.mask(i),true)
-  if(i == 0)
-  poke(c.io.sc2mac_wt.bits.data(i),11)
-  else
-  poke(c.io.sc2mac_wt.bits.data(i),0) 
+  poke(c.io.sc2mac_wt.bits.data(i),wt2(2)(i))
   if(i == 2)
   poke(c.io.sc2mac_wt.bits.sel(i),1)
   else
@@ -194,10 +166,7 @@ poke(c.io.csb2cacc.req.bits,"b00000000100000000000000000000000000000001000000000
   poke(c.io.sc2mac_dat.bits.pd,"b000000000".U)
   for(i<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(i),true)
-  if(i==0)
-  poke(c.io.sc2mac_dat.bits.data(i),1)
-  else
-  poke(c.io.sc2mac_dat.bits.data(i),0)
+  poke(c.io.sc2mac_dat.bits.data(i),dat1(2)(i))
   }
   
   step(1)//11
@@ -205,10 +174,7 @@ poke(c.io.csb2cacc.req.bits,"b00000000100000000000000000000000000000001000000000
   poke(c.io.sc2mac_wt.valid,true)
   for( i <- 0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_wt.bits.mask(i),true)
-  if(i == 0)
-  poke(c.io.sc2mac_wt.bits.data(i),12)
-  else
-  poke(c.io.sc2mac_wt.bits.data(i),0) 
+  poke(c.io.sc2mac_wt.bits.data(i),wt2(3)(i))
   if(i == 3)
   poke(c.io.sc2mac_wt.bits.sel(i),1)
   else
@@ -218,20 +184,14 @@ poke(c.io.csb2cacc.req.bits,"b00000000100000000000000000000000000000001000000000
   poke(c.io.sc2mac_dat.bits.pd,"b000000000".U)
   for(i<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(i),true)
-  if(i==0)
-  poke(c.io.sc2mac_dat.bits.data(i),1)
-  else
-  poke(c.io.sc2mac_dat.bits.data(i),0)
+  poke(c.io.sc2mac_dat.bits.data(i),dat1(3)(i))
   }
   step(1)//12
 
   poke(c.io.sc2mac_wt.valid,true)
   for( i <- 0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_wt.bits.mask(i),true)
-  if(i == 0)
-  poke(c.io.sc2mac_wt.bits.data(i),13)
-  else
-  poke(c.io.sc2mac_wt.bits.data(i),0) 
+  poke(c.io.sc2mac_wt.bits.data(i),wt2(4)(i))
   if(i == 4)
   poke(c.io.sc2mac_wt.bits.sel(i),1)
   else
@@ -241,20 +201,14 @@ poke(c.io.csb2cacc.req.bits,"b00000000100000000000000000000000000000001000000000
   poke(c.io.sc2mac_dat.bits.pd,"b000000000".U)
   for(i<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(i),true)
-  if(i==0)
-  poke(c.io.sc2mac_dat.bits.data(i),1)
-  else
-  poke(c.io.sc2mac_dat.bits.data(i),0)
+  poke(c.io.sc2mac_dat.bits.data(i),dat1(4)(i))
   }
   step(1)//13
 
   poke(c.io.sc2mac_wt.valid,true)
   for( i <- 0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_wt.bits.mask(i),true)
-  if(i == 0)
-  poke(c.io.sc2mac_wt.bits.data(i),14)
-  else
-  poke(c.io.sc2mac_wt.bits.data(i),0) 
+  poke(c.io.sc2mac_wt.bits.data(i),wt2(5)(i))
   if(i == 5)
   poke(c.io.sc2mac_wt.bits.sel(i),1)
   else
@@ -264,20 +218,14 @@ poke(c.io.csb2cacc.req.bits,"b00000000100000000000000000000000000000001000000000
   poke(c.io.sc2mac_dat.bits.pd,"b000000000".U)
   for(i<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(i),true)
-  if(i==0)
-  poke(c.io.sc2mac_dat.bits.data(i),1)
-  else
-  poke(c.io.sc2mac_dat.bits.data(i),0)
+  poke(c.io.sc2mac_dat.bits.data(i),dat1(5)(i))
   }
   step(1)//14
                       //cacc st
   poke(c.io.sc2mac_wt.valid,true)
   for( i <- 0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_wt.bits.mask(i),true)
-  if(i == 0)
-  poke(c.io.sc2mac_wt.bits.data(i),15)
-  else
-  poke(c.io.sc2mac_wt.bits.data(i),0) 
+  poke(c.io.sc2mac_wt.bits.data(i),wt2(6)(i))
   if(i == 6)
   poke(c.io.sc2mac_wt.bits.sel(i),1)
   else
@@ -287,10 +235,7 @@ poke(c.io.csb2cacc.req.bits,"b00000000100000000000000000000000000000001000000000
   poke(c.io.sc2mac_dat.bits.pd,"b000000000".U)
   for(i<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(i),true)
-  if(i==0)
-  poke(c.io.sc2mac_dat.bits.data(i),1)
-  else
-  poke(c.io.sc2mac_dat.bits.data(i),0)
+  poke(c.io.sc2mac_dat.bits.data(i),dat1(6)(i))
   }
   
   step(1)//15
@@ -298,10 +243,7 @@ poke(c.io.csb2cacc.req.bits,"b00000000100000000000000000000000000000001000000000
   poke(c.io.sc2mac_wt.valid,true)
   for( i <- 0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_wt.bits.mask(i),true)
-  if(i == 0)
-  poke(c.io.sc2mac_wt.bits.data(i),16)
-  else
-  poke(c.io.sc2mac_wt.bits.data(i),0) 
+  poke(c.io.sc2mac_wt.bits.data(i),wt2(7)(i))
   if(i == 7)
   poke(c.io.sc2mac_wt.bits.sel(i),1)
   else
@@ -311,107 +253,83 @@ poke(c.io.csb2cacc.req.bits,"b00000000100000000000000000000000000000001000000000
   poke(c.io.sc2mac_dat.bits.pd,"b001000000".U)
   for(i<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(i),true)
-  if(i==0)
-  poke(c.io.sc2mac_dat.bits.data(i),1)
-  else
-  poke(c.io.sc2mac_dat.bits.data(i),0)
+  poke(c.io.sc2mac_dat.bits.data(i),dat1(7)(i))
   }
   
   step(1)//16
   
   poke(c.io.sc2mac_wt.valid,false)
+  poke(c.io.sc2mac_dat.valid,false)
+  
+  step(6)
   poke(c.io.sc2mac_dat.valid,true)
-  poke(c.io.sc2mac_dat.bits.pd,"b110100000".U)
+  poke(c.io.sc2mac_dat.bits.pd,"b010100000".U)
   for(i<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(i),true)
-  if(i==0)
-  poke(c.io.sc2mac_dat.bits.data(i),1)
-  else
-  poke(c.io.sc2mac_dat.bits.data(i),0)
+  poke(c.io.sc2mac_dat.bits.data(i),dat2(0)(i))
   }
   
   step(1)//17
   
   poke(c.io.sc2mac_dat.valid,true)
-  poke(c.io.sc2mac_dat.bits.pd,"b110000000".U)
+  poke(c.io.sc2mac_dat.bits.pd,"b010000000".U)
   for(i<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(i),true)
-  if(i==0)
-  poke(c.io.sc2mac_dat.bits.data(i),1)
-  else
-  poke(c.io.sc2mac_dat.bits.data(i),0)
+  poke(c.io.sc2mac_dat.bits.data(i),dat2(1)(i))
   }
   
   step(1)//18
   
   poke(c.io.sc2mac_dat.valid,true)
-  poke(c.io.sc2mac_dat.bits.pd,"b110000000".U)
+  poke(c.io.sc2mac_dat.bits.pd,"b010000000".U)
   for(i<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(i),true)
-  if(i==0)
-  poke(c.io.sc2mac_dat.bits.data(i),1)
-  else
-  poke(c.io.sc2mac_dat.bits.data(i),0)
+  poke(c.io.sc2mac_dat.bits.data(i),dat2(2)(i))
   }
   
   step(1)//19
   
   poke(c.io.sc2mac_dat.valid,true)
-  poke(c.io.sc2mac_dat.bits.pd,"b110000000".U)
+  poke(c.io.sc2mac_dat.bits.pd,"b010000000".U)
   for(i<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(i),true)
-  if(i==0)
-  poke(c.io.sc2mac_dat.bits.data(i),1)
-  else
-  poke(c.io.sc2mac_dat.bits.data(i),0)
+  poke(c.io.sc2mac_dat.bits.data(i),dat2(3)(i))
   }
   
   step(1)//20
   
   poke(c.io.sc2mac_dat.valid,true)
-  poke(c.io.sc2mac_dat.bits.pd,"b110000000".U)
+  poke(c.io.sc2mac_dat.bits.pd,"b010000000".U)
   for(i<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(i),true)
-  if(i==0)
-  poke(c.io.sc2mac_dat.bits.data(i),1)
-  else
-  poke(c.io.sc2mac_dat.bits.data(i),0)
+  poke(c.io.sc2mac_dat.bits.data(i),dat2(4)(i))
   }
   
   step(1)//21
   
   poke(c.io.sc2mac_dat.valid,true)
-  poke(c.io.sc2mac_dat.bits.pd,"b110000000".U)
+  poke(c.io.sc2mac_dat.bits.pd,"b010000000".U)
   for(i<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(i),true)
-  if(i==0)
-  poke(c.io.sc2mac_dat.bits.data(i),1)
-  else
-  poke(c.io.sc2mac_dat.bits.data(i),0)
+  poke(c.io.sc2mac_dat.bits.data(i),dat2(5)(i))
   }
   
   step(1)//22
   
   poke(c.io.sc2mac_dat.valid,true)
-  poke(c.io.sc2mac_dat.bits.pd,"b110000000".U)
+  poke(c.io.sc2mac_dat.bits.pd,"b010000000".U)
   for(i<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(i),true)
-  if(i==0)
-  poke(c.io.sc2mac_dat.bits.data(i),1)
-  else
-  poke(c.io.sc2mac_dat.bits.data(i),0)
+  poke(c.io.sc2mac_dat.bits.data(i),dat2(6)(i))
   }
   
   step(1)//23
   
   poke(c.io.sc2mac_dat.valid,true)
-  poke(c.io.sc2mac_dat.bits.pd,"b111000000".U)
+  poke(c.io.sc2mac_dat.bits.pd,"b011000000".U)
   for(i<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(i),true)
-  if(i==0)
-  poke(c.io.sc2mac_dat.bits.data(i),1)
-  else
-  poke(c.io.sc2mac_dat.bits.data(i),0)
+  poke(c.io.sc2mac_dat.bits.data(i),dat2(7)(i))
   }
   
   step(1)//24
@@ -428,26 +346,40 @@ poke(c.io.csb2cacc.req.bits,"b00000000100000000000000000000000000000001000000000
   step(1)//28
   
   step(1)//29
-  
-  step(1)//30
-  for(i <-0 to 6){
+  val mout1 =  Array.ofDim[Int](8,8)
+  val mout2 =  Array.ofDim[Int](8,8)
+  for(i <-0 to 7)
+    for(j <-0 to 7){
+    mout1(i)(j) = dat1(i)(0)*wt1(j)(0) +dat1(i)(1)*wt1(j)(1) +dat1(i)(2)*wt1(j)(2) +dat1(i)(3)*wt1(j)(3) +dat1(i)(4)*wt1(j)(4) +dat1(i)(5)*wt1(j)(5) +dat1(i)(6)*wt1(j)(6) +dat1(i)(7)*wt1(j)(7)
+    mout2(i)(j) = dat2(i)(0)*wt2(j)(0) +dat2(i)(1)*wt2(j)(1) +dat2(i)(2)*wt2(j)(2) +dat2(i)(3)*wt2(j)(3) +dat2(i)(4)*wt2(j)(4) +dat2(i)(5)*wt2(j)(5) +dat2(i)(6)*wt2(j)(6) +dat2(i)(7)*wt2(j)(7) 
+  }
+  val out = Array.ofDim[Int](8,8)
+  for(i<-0 to 7)
+    for(j<-0 to 7){
+    out(i)(j) = mout1(i)(j)+mout2(i)(j)
+  }
+  step(10)//30
+  for(i <-0 to 7){
   step(1)//31
-  expect(c.io.cacc2ppu_pd.valid,true)//out1
-  expect(c.io.cacc2ppu_pd.bits,"b0000000000000000000000000000010000000000000000000000000000000011100000000000000000000000000000110000000000000000000000000000001010".U)
+  poke(c.io.cacc2ppu_pd_ready,true)
+  expect(c.io.cacc2ppu_pd_valid,true)//out1
+  expect(c.io.out1,out(i)(0))
+  expect(c.io.out2,out(i)(1))
+  expect(c.io.out3,out(i)(2))
+  expect(c.io.out4,out(i)(3))
   step(1)//32
-  expect(c.io.cacc2ppu_pd.valid,true)
-  expect(c.io.cacc2ppu_pd.bits,"b0000000000000000000000000000011000000000000000000000000000000101100000000000000000000000000001010000000000000000000000000000010010".U)
+  expect(c.io.cacc2ppu_pd_valid,true)//out1
+  expect(c.io.out1,out(i)(4))
+  expect(c.io.out2,out(i)(5))
+  expect(c.io.out3,out(i)(6))
+  expect(c.io.out4,out(i)(7))
   step(1)
- expect(c.io.cacc2ppu_pd.valid,false)}
+  expect(c.io.cacc2ppu_pd_valid,false)}
   step(1)
-  expect(c.io.cacc2ppu_pd.valid,true)
-  expect(c.io.cacc2ppu_pd.bits,"b0000000000000000000000000000010000000000000000000000000000000011100000000000000000000000000000110000000000000000000000000000001010".U)
+  //poke(c.io.somnia_core_rstn,false)
+  poke(c.io.cacc2ppu_pd_ready,false)
   step(1)
-  expect(c.io.cacc2ppu_pd.valid,true)
-  expect(c.io.cacc2ppu_pd.bits,"b1000000000000000000000000000011000000000000000000000000000000101100000000000000000000000000001010000000000000000000000000000010010".U)
-  step(1)
- expect(c.io.cacc2ppu_pd.valid,false)
- 
+}
 }
 class SOMNIA_convolution_Tester extends ChiselFlatSpec{
   behavior of "SOMNIA_convolution"
