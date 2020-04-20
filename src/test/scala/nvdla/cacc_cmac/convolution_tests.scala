@@ -7,17 +7,17 @@ import chisel3.util._
 class SOMNIA_convolution_Tests (c:SOMNIA_convolution) extends PeekPokeTester(c){
   implicit val conf: somniaConfig = new somniaConfig
   import scala.util.Random
-for(i <-0 to 100){
+for(i <-0 to 10){
   val wt1 =Array.ofDim[Int](8,8)
   val wt2 =Array.ofDim[Int](8,8)
   val dat1 = Array.ofDim[Int](8,8)
   val dat2 = Array.ofDim[Int](8,8)
   for (i <-0 to 7)
     for (j <-0 to 7){
-    wt1(i)(j)=Random.nextInt(128)
-    wt2(i)(j)=Random.nextInt(128)
-    dat1(i)(j)=Random.nextInt(128)
-    dat2(i)(j)=Random.nextInt(128) 
+    wt1(i)(j)= Random.nextInt(2*(1<<(conf.CMAC_BPE-1)-1)) - (1 << (conf.CMAC_BPE-1) - 1)
+    wt2(i)(j)=Random.nextInt(2*(1<<(conf.CMAC_BPE-1)-1)) - (1 << (conf.CMAC_BPE-1) - 1)
+    dat1(i)(j)=Random.nextInt(2*(1<<(conf.CMAC_BPE-1)-1)) - (1 << (conf.CMAC_BPE-1) - 1)
+    dat2(i)(j)=Random.nextInt(2*(1<<(conf.CMAC_BPE-1)-1)) - (1 << (conf.CMAC_BPE-1) - 1)  
     }
   poke(c.io.somnia_core_rstn,true)
   poke(c.io.csb2cacc.req.valid,true)
@@ -346,33 +346,42 @@ for(i <-0 to 100){
   step(1)//28
   
   step(1)//29
-  val mout1 =  Array.ofDim[Int](8,8)
-  val mout2 =  Array.ofDim[Int](8,8)
+  val mout1 =  Array.ofDim[BigInt](8,8)
+  val mout2 =  Array.ofDim[BigInt](8,8)
   for(i <-0 to 7)
     for(j <-0 to 7){
     mout1(i)(j) = dat1(i)(0)*wt1(j)(0) +dat1(i)(1)*wt1(j)(1) +dat1(i)(2)*wt1(j)(2) +dat1(i)(3)*wt1(j)(3) +dat1(i)(4)*wt1(j)(4) +dat1(i)(5)*wt1(j)(5) +dat1(i)(6)*wt1(j)(6) +dat1(i)(7)*wt1(j)(7)
     mout2(i)(j) = dat2(i)(0)*wt2(j)(0) +dat2(i)(1)*wt2(j)(1) +dat2(i)(2)*wt2(j)(2) +dat2(i)(3)*wt2(j)(3) +dat2(i)(4)*wt2(j)(4) +dat2(i)(5)*wt2(j)(5) +dat2(i)(6)*wt2(j)(6) +dat2(i)(7)*wt2(j)(7) 
   }
-  val out = Array.ofDim[Int](8,8)
+  val out = Array.ofDim[BigInt](8,8)
   for(i<-0 to 7)
     for(j<-0 to 7){
     out(i)(j) = mout1(i)(j)+mout2(i)(j)
+  }
+  val bias = BigInt("4294967296") 
+  val fout = Array.ofDim[BigInt](8,8)
+  for(i<-0 to 7)
+    for(j<-0 to 7){
+    if(out(i)(j)<0)
+    fout(i)(j) = out(i)(j) +bias
+    else
+    fout(i)(j) = out(i)(j)
   }
   step(10)//30
   for(i <-0 to 7){
   step(1)//31
   poke(c.io.cacc2ppu_pd_ready,true)
   expect(c.io.cacc2ppu_pd_valid,true)//out1
-  expect(c.io.out1,out(i)(0))
-  expect(c.io.out2,out(i)(1))
-  expect(c.io.out3,out(i)(2))
-  expect(c.io.out4,out(i)(3))
+  expect(c.io.out1,fout(i)(0))
+  expect(c.io.out2,fout(i)(1))
+  expect(c.io.out3,fout(i)(2))
+  expect(c.io.out4,fout(i)(3))
   step(1)//32
   expect(c.io.cacc2ppu_pd_valid,true)//out1
-  expect(c.io.out1,out(i)(4))
-  expect(c.io.out2,out(i)(5))
-  expect(c.io.out3,out(i)(6))
-  expect(c.io.out4,out(i)(7))
+  expect(c.io.out1,fout(i)(4))
+  expect(c.io.out2,fout(i)(5))
+  expect(c.io.out3,fout(i)(6))
+  expect(c.io.out4,fout(i)(7))
   step(1)
   expect(c.io.cacc2ppu_pd_valid,false)}
   step(1)
