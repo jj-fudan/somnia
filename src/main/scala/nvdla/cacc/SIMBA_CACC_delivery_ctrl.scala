@@ -117,13 +117,13 @@ when(dlv_data_add_valid | dlv_data_sub_valid){
 
 ///// generate dbuf read request   
 val dbuf_rd_addr_cnt = RegInit("b0".asUInt(conf.CACC_DBUF_AWIDTH.W))
-val en = RegInit(false.B)
-val en_w = dbuf_wr_addr_out.andR
-    en := en_w
+//val en = RegInit(false.B)
+//val en_w = dbuf_wr_addr_out.andR
+//    en := en_w
 dlv_pop := io.dbuf_rd_addr.valid & io.dbuf_rd_ready 
 val dbuf_rd_addr_cnt_inc = dbuf_rd_addr_cnt + 1.U
 val dbuf_empty = ~(dlv_data_avl.orR)
-io.dbuf_rd_addr.valid := (~dbuf_empty) &en
+io.dbuf_rd_addr.valid := (~dbuf_empty) //&en
 io.dbuf_rd_addr.bits := dbuf_rd_addr_cnt
 
 when(dlv_pop){

@@ -24,15 +24,13 @@ class nv_ram_rws(dep: Int, wid: Int) extends Module{
     })
  //withClock(io.clk){
    withClock(clock){
-    // Create a synchronous-read, synchronous-write memory (like in FPGAs).
-    val mem = SyncReadMem(dep, UInt(wid.W))
-    // Create one write port and one read port.
+    val mem = Reg(Vec(dep, UInt(wid.W)))
+    val ra_d = Reg(UInt(log2Ceil(dep).W))
     when (io.we) { 
-        mem.write(io.wa, io.di) 
-        io.dout := DontCare
+        mem(io.wa) := io.di
     }
-    .otherwise{ 
-        io.dout := mem.read(io.ra, io.re)
+    when (io.re) {
+        ra_d := io.ra
     }
-
+    io.dout := mem(ra_d)
 }}

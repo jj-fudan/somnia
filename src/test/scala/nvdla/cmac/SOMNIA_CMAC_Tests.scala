@@ -15,17 +15,61 @@ for(i <-0 to 4){
   val wt2 =Array.ofDim[Int](8,8)
   val dat1 = Array.ofDim[Int](8,8)
   val dat2 = Array.ofDim[Int](8,8)
+     val dat1_mask = Array.ofDim[Boolean](8,8) 
+  val wt1_mask  = Array.ofDim[Boolean](8,8)
+  val dat2_mask = Array.ofDim[Boolean](8,8) 
+  val wt2_mask  = Array.ofDim[Boolean](8,8)
   for (i <-0 to 7)
     for (j <-0 to 7){
     wt1(i)(j)=Random.nextInt(128)
     wt2(i)(j)=Random.nextInt(128)
     dat1(i)(j)=Random.nextInt(128)
     dat2(i)(j)=Random.nextInt(128) 
-    //dat1(i)(j)=1
-    //dat2(i)(j)=1
+    dat1_mask(i)(j) =Random.nextBoolean()
+    wt1_mask(i)(j) =Random.nextBoolean() 
+    dat2_mask(i)(j) =Random.nextBoolean()
+    wt2_mask(i)(j) =wt1_mask(i)(j)
     }
-  val mout1 =  Array.ofDim[Int](8,8)
-  val mout2 =  Array.ofDim[Int](8,8)
+  var mout1 =  Array.ofDim[BigInt](8,8)
+  var mout2 =  Array.ofDim[BigInt](8,8)
+  var pout1  = Array.fill(conf.CMAC_ATOMC){0}
+  var pout2  = Array.fill(conf.CMAC_ATOMC){0}
+  for(i <-0 to 7)
+    for(j <-0 to 7){
+       for(k<-0 to 7){
+        if(dat1_mask(i)(k) & wt1_mask(j)(k)){
+        pout1(k) =dat1(i)(k)*wt1(j)(k) 
+        }
+        else{
+        pout1(k)=0
+        }
+        if(dat2_mask(i)(k) & wt2_mask(i)(k)){
+        pout2(k) =dat2(i)(k)*wt2(j)(k)
+        }
+        else{
+        pout2(k)=0
+        }
+       }
+       mout1(i)(j)=pout1.reduce(_+_)
+       mout2(i)(j)=pout2.reduce(_+_)
+    //mout1(i)(j) = dat1(i)(0)*wt1(j)(0) +dat1(i)(1)*wt1(j)(1) +dat1(i)(2)*wt1(j)(2) +dat1(i)(3)*wt1(j)(3) +dat1(i)(4)*wt1(j)(4) +dat1(i)(5)*wt1(j)(5) +dat1(i)(6)*wt1(j)(6) +dat1(i)(7)*wt1(j)(7)
+    //mout2(i)(j) = dat2(i)(0)*wt2(j)(0) +dat2(i)(1)*wt2(j)(1) +dat2(i)(2)*wt2(j)(2) +dat2(i)(3)*wt2(j)(3) +dat2(i)(4)*wt2(j)(4) +dat2(i)(5)*wt2(j)(5) +dat2(i)(6)*wt2(j)(6) +dat2(i)(7)*wt2(j)(7)
+  }
+  
+  val out = Array.ofDim[BigInt](8,8)
+  for(i<-0 to 7)
+    for(j<-0 to 7){
+    out(i)(j) = mout1(i)(j)+mout2(i)(j)
+  }
+  val bias = BigInt("4294967296") 
+  val fout = Array.ofDim[BigInt](8,8)
+  for(i<-0 to 7)
+    for(j<-0 to 7){
+    if(out(i)(j)<0)
+    fout(i)(j) = out(i)(j) +bias
+    else
+    fout(i)(j) = out(i)(j)
+  }
   for(i <-0 to 7)
     for(j <-0 to 7){
     mout1(i)(j) = dat1(i)(0)*wt1(j)(0) +dat1(i)(1)*wt1(j)(1) +dat1(i)(2)*wt1(j)(2) +dat1(i)(3)*wt1(j)(3) +dat1(i)(4)*wt1(j)(4) +dat1(i)(5)*wt1(j)(5) +dat1(i)(6)*wt1(j)(6) +dat1(i)(7)*wt1(j)(7)
@@ -45,7 +89,7 @@ for(i <-0 to 4){
 
   poke(c.io.sc2mac_wt.valid,true)
   for( i <- 0 to conf.CMAC_ATOMK-1){
-  poke(c.io.sc2mac_wt.bits.mask(i),true)
+  poke(c.io.sc2mac_wt.bits.mask(i),wt1_mask(0)(i))
   poke(c.io.sc2mac_wt.bits.data(i),wt1(1)(i)) 
   if(i == 1)
   poke(c.io.sc2mac_wt.bits.sel(i),1)
