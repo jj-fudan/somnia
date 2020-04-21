@@ -7,7 +7,7 @@ import chisel3.util._
 class SOMNIA_convolution_Tests (c:SOMNIA_convolution) extends PeekPokeTester(c){
   implicit val conf: somniaConfig = new somniaConfig
   import scala.util.Random
-//for(i <-0 to 10){
+for(i <-0 to 10){
   val wt1 =Array.ofDim[Int](8,8)
   val wt2 =Array.ofDim[Int](8,8)
   val dat1 = Array.ofDim[Int](8,8)
@@ -434,7 +434,7 @@ class SOMNIA_convolution_Tests (c:SOMNIA_convolution) extends PeekPokeTester(c){
   //poke(c.io.somnia_core_rstn,false)
   poke(c.io.cacc2ppu_pd_ready,false)
   step(1)
-//}
+}
 }
 class SOMNIA_convolution_Tester extends ChiselFlatSpec{
   behavior of "SOMNIA_convolution"

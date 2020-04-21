@@ -30,7 +30,9 @@ class SOMNIA_convolution_Tests2 (c:SOMNIA_convolution) extends PeekPokeTester(c)
        wt_actv_mask(i)(j)=false
      }
   }
-  val spc = Random.nextInt(9)+1
+  val spc = Random.nextInt(9)+1//stripe per channel
+  val cpl = Random.nextInt(9)+1//channel per layer
+for(layer <-0 to cpl-1){
   for(i <- 0 to spc-1){
   val wt =Array.ofDim[Int](8,8)
   val dat=Array.ofDim[Int](8,8)
@@ -38,6 +40,7 @@ class SOMNIA_convolution_Tests2 (c:SOMNIA_convolution) extends PeekPokeTester(c)
   val wt_mask=Array.ofDim[Boolean](8,8)
   var channel_end = 0
   var channel_st  = 0
+  var layer_end = 0
   if(i == spc-1){
   channel_end = 1}
   else{
@@ -46,6 +49,10 @@ class SOMNIA_convolution_Tests2 (c:SOMNIA_convolution) extends PeekPokeTester(c)
   channel_st = 1}
   else{
   channel_st = 0}
+  if(layer == cpl-1 & i==spc-1){
+  layer_end=1}
+  else{
+  layer_end=0}
   for(ii <- 0 to 7){
     for(jj <-0 to 7){
       wt(ii)(jj)= Random.nextInt(2*(1<<(conf.CMAC_BPE-1)-1)) - (1 << (conf.CMAC_BPE-1) - 1)
@@ -64,7 +71,7 @@ class SOMNIA_convolution_Tests2 (c:SOMNIA_convolution) extends PeekPokeTester(c)
   poke(c.io.sc2mac_wt.bits.sel(n),0)
   }
   poke(c.io.sc2mac_dat.valid,true)
-  poke(c.io.sc2mac_dat.bits.pd,(1<<5)+(channel_end<<7))
+  poke(c.io.sc2mac_dat.bits.pd,(1<<5)+(channel_end<<7)+(layer_end<<8))
   for(n<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(n),dat_mask(0)(n))
   poke(c.io.sc2mac_dat.bits.data(n),dat(0)(n))
@@ -81,7 +88,7 @@ class SOMNIA_convolution_Tests2 (c:SOMNIA_convolution) extends PeekPokeTester(c)
   poke(c.io.sc2mac_wt.bits.sel(n),0)
   }
   poke(c.io.sc2mac_dat.valid,true)
-  poke(c.io.sc2mac_dat.bits.pd,0+channel_end<<7)
+  poke(c.io.sc2mac_dat.bits.pd,(channel_end<<7)+(layer_end<<8))
   for(n<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(n),dat_mask(1)(n))
   poke(c.io.sc2mac_dat.bits.data(n),dat(1)(n))
@@ -98,7 +105,7 @@ class SOMNIA_convolution_Tests2 (c:SOMNIA_convolution) extends PeekPokeTester(c)
   poke(c.io.sc2mac_wt.bits.sel(n),0)
   }
   poke(c.io.sc2mac_dat.valid,true)
-  poke(c.io.sc2mac_dat.bits.pd,0+channel_end<<7)
+  poke(c.io.sc2mac_dat.bits.pd,(channel_end<<7)+(layer_end<<8))
   for(n<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(n),dat_mask(2)(n))
   poke(c.io.sc2mac_dat.bits.data(n),dat(2)(n))
@@ -115,7 +122,7 @@ class SOMNIA_convolution_Tests2 (c:SOMNIA_convolution) extends PeekPokeTester(c)
   poke(c.io.sc2mac_wt.bits.sel(n),0)
   }
   poke(c.io.sc2mac_dat.valid,true)
-  poke(c.io.sc2mac_dat.bits.pd,0+channel_end<<7)
+  poke(c.io.sc2mac_dat.bits.pd,(channel_end<<7)+(layer_end<<8))
   for(n<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(n),dat_mask(3)(n))
   poke(c.io.sc2mac_dat.bits.data(n),dat(3)(n))
@@ -132,7 +139,7 @@ class SOMNIA_convolution_Tests2 (c:SOMNIA_convolution) extends PeekPokeTester(c)
   poke(c.io.sc2mac_wt.bits.sel(n),0)
   }
   poke(c.io.sc2mac_dat.valid,true)
-  poke(c.io.sc2mac_dat.bits.pd,0+channel_end<<7)
+  poke(c.io.sc2mac_dat.bits.pd,(channel_end<<7)+(layer_end<<8))
   for(n<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(n),dat_mask(4)(n))
   poke(c.io.sc2mac_dat.bits.data(n),dat(4)(n))
@@ -149,7 +156,7 @@ class SOMNIA_convolution_Tests2 (c:SOMNIA_convolution) extends PeekPokeTester(c)
   poke(c.io.sc2mac_wt.bits.sel(n),0)
   }
   poke(c.io.sc2mac_dat.valid,true)
-  poke(c.io.sc2mac_dat.bits.pd,0+channel_end<<7)
+  poke(c.io.sc2mac_dat.bits.pd,(channel_end<<7)+(layer_end<<8))
   for(n<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(n),dat_mask(5)(n))
   poke(c.io.sc2mac_dat.bits.data(n),dat(5)(n))
@@ -166,7 +173,7 @@ class SOMNIA_convolution_Tests2 (c:SOMNIA_convolution) extends PeekPokeTester(c)
   poke(c.io.sc2mac_wt.bits.sel(n),0)
   }
   poke(c.io.sc2mac_dat.valid,true)
-  poke(c.io.sc2mac_dat.bits.pd,0+channel_end<<7)
+  poke(c.io.sc2mac_dat.bits.pd,(channel_end<<7)+(layer_end<<8))
   for(n<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(n),dat_mask(6)(n))
   poke(c.io.sc2mac_dat.bits.data(n),dat(6)(n))
@@ -183,7 +190,7 @@ class SOMNIA_convolution_Tests2 (c:SOMNIA_convolution) extends PeekPokeTester(c)
   poke(c.io.sc2mac_wt.bits.sel(n),0)
   }
   poke(c.io.sc2mac_dat.valid,true)
-  poke(c.io.sc2mac_dat.bits.pd,(1<<6)+(channel_end<<7))
+  poke(c.io.sc2mac_dat.bits.pd,(1<<6)+(channel_end<<7)+(layer_end<<8))
   for(n<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(n),dat_mask(7)(n))
   poke(c.io.sc2mac_dat.bits.data(n),dat(7)(n))
@@ -259,7 +266,7 @@ class SOMNIA_convolution_Tests2 (c:SOMNIA_convolution) extends PeekPokeTester(c)
   expect(c.io.cacc2ppu_pd_valid,false)}
   }
 
-  }
+  }}
 }
 
 class SOMNIA_convolution_Tester2 extends ChiselFlatSpec{
