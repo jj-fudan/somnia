@@ -71,7 +71,7 @@ for(layer <-0 to cpl-1){
   poke(c.io.sc2mac_wt.bits.sel(n),0)
   }
   poke(c.io.sc2mac_dat.valid,true)//dat1
-  poke(c.io.sc2mac_dat.bits.pd,(1<<5)+(channel_end<<7)+(layer_end<<8))
+  poke(c.io.sc2mac_dat.bits.pd,(1<<5)+(channel_end<<7)+(layer_end<<8))//stripe start
   for(n<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(n),dat_mask(0)(n))
   poke(c.io.sc2mac_dat.bits.data(n),dat(0)(n))
@@ -190,7 +190,7 @@ for(layer <-0 to cpl-1){
   poke(c.io.sc2mac_wt.bits.sel(n),0)
   }
   poke(c.io.sc2mac_dat.valid,true)//dat8
-  poke(c.io.sc2mac_dat.bits.pd,(1<<6)+(channel_end<<7)+(layer_end<<8))
+  poke(c.io.sc2mac_dat.bits.pd,(1<<6)+(channel_end<<7)+(layer_end<<8))//stripe end
   for(n<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(n),dat_mask(7)(n))
   poke(c.io.sc2mac_dat.bits.data(n),dat(7)(n))
@@ -231,12 +231,12 @@ for(layer <-0 to cpl-1){
     for(jj<-0 to 7)
     calout(ii)(jj) = psum(ii)(jj) + sum_out(ii)(jj)
   }     
-  if(channel_end == 0){//accumulation psum
+  if(channel_end == 0){//not channel end accumulate psum
   for(ii<-0 to 7)
      for(jj<-0 to 7)
      psum(ii)(jj) = calout(ii)(jj)
   }
-  else{//delivery to ppu
+  else{//channel end deliver final sum to ppu
   for(ii<-0 to 7)
      for(jj<-0 to 7){
      if(calout(ii)(jj) <0)
@@ -244,7 +244,7 @@ for(layer <-0 to cpl-1){
      else
      fsum(ii)(jj) = calout(ii)(jj)}
   }
-  if(channel_end == 1){
+  if(channel_end == 1){//wait for read final data
   poke(c.io.sc2mac_dat.valid,false)
   poke(c.io.sc2mac_wt.valid,false)
   step(6)
