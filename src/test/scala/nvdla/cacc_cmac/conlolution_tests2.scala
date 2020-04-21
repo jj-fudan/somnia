@@ -11,18 +11,18 @@ class SOMNIA_convolution_Tests2 (c:SOMNIA_convolution) extends PeekPokeTester(c)
   poke(c.io.csb2cacc.req.valid,true)
   poke(c.io.cacc2ppu_pd_ready,true)
   poke(c.io.somnia_core_rstn,true)//no reset
-  poke(c.io.csb2cacc.req.bits,"b000000001000000000000000000000000000000000000000000000000001011".U)
-  step(1)//truncate=0
+  poke(c.io.csb2cacc.req.bits,"b000000001000000000000000000000000000000000000000000000000001011".U)//truncate=0
+  step(1)
   poke(c.io.csb2cacc.req.bits,"b000000001000000000000000000000000000000010000000000000000011011".U)//bypass =1
   step(1)
   poke(c.io.csb2cacc.req.bits,"b000000001000000000000000000000000000000010000000000000000000010".U)
   step(1)
   ///////////////////
-  var psum = Array.ofDim[BigInt](8,8)
+  var psum = Array.ofDim[BigInt](8,8)//to store partial sum
   for(i<-0 to 7)
     for(j<-0 to 7)
     psum(i)(j) = 0
-  var wt_actv_data = Array.ofDim[Int](8,8)
+  var wt_actv_data = Array.ofDim[Int](8,8)//to store actv wt
   var wt_actv_mask = Array.ofDim[Boolean](8,8)
   for (i <- 0 to 7){
      for (j <- 0 to 7){
@@ -34,14 +34,14 @@ class SOMNIA_convolution_Tests2 (c:SOMNIA_convolution) extends PeekPokeTester(c)
   val cpl = Random.nextInt(9)+1//channel per layer
 for(layer <-0 to cpl-1){
   for(i <- 0 to spc-1){
-  val wt =Array.ofDim[Int](8,8)
-  val dat=Array.ofDim[Int](8,8)
-  val dat_mask=Array.ofDim[Boolean](8,8)
-  val wt_mask=Array.ofDim[Boolean](8,8)
+  val wt =Array.ofDim[Int](8,8)//input wt
+  val dat=Array.ofDim[Int](8,8)//input data
+  val dat_mask=Array.ofDim[Boolean](8,8)//input data_mask
+  val wt_mask=Array.ofDim[Boolean](8,8)//input wt_mask
   var channel_end = 0
   var channel_st  = 0
   var layer_end = 0
-  if(i == spc-1){
+  if(i == spc-1){  //channel end sign
   channel_end = 1}
   else{
   channel_end = 0}
@@ -49,11 +49,11 @@ for(layer <-0 to cpl-1){
   channel_st = 1}
   else{
   channel_st = 0}
-  if(layer == cpl-1 & i==spc-1){
+  if(layer == cpl-1 & i==spc-1){//layer_end sign
   layer_end=1}
   else{
   layer_end=0}
-  for(ii <- 0 to 7){
+  for(ii <- 0 to 7){//initialization
     for(jj <-0 to 7){
       wt(ii)(jj)= Random.nextInt(2*(1<<(conf.CMAC_BPE-1)-1)) - (1 << (conf.CMAC_BPE-1) - 1)
       dat(ii)(jj)=Random.nextInt(2*(1<<(conf.CMAC_BPE-1)-1)) - (1 << (conf.CMAC_BPE-1) - 1)
@@ -61,8 +61,8 @@ for(layer <-0 to cpl-1){
       wt_mask(ii)(jj) =Random.nextBoolean() 
     }
   }
-  poke(c.io.sc2mac_wt.valid,true)
-  for( n <- 0 to conf.CMAC_ATOMK-1){
+  poke(c.io.sc2mac_wt.valid,true)//Input data of one strip in eight cycles
+  for( n <- 0 to conf.CMAC_ATOMK-1){//wt1
   poke(c.io.sc2mac_wt.bits.mask(n),wt_mask(0)(n))
   poke(c.io.sc2mac_wt.bits.data(n),wt(0)(n))
   if(n == 0)
@@ -70,7 +70,7 @@ for(layer <-0 to cpl-1){
   else
   poke(c.io.sc2mac_wt.bits.sel(n),0)
   }
-  poke(c.io.sc2mac_dat.valid,true)
+  poke(c.io.sc2mac_dat.valid,true)//dat1
   poke(c.io.sc2mac_dat.bits.pd,(1<<5)+(channel_end<<7)+(layer_end<<8))
   for(n<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(n),dat_mask(0)(n))
@@ -78,7 +78,7 @@ for(layer <-0 to cpl-1){
   }
   step(1)
  
-  poke(c.io.sc2mac_wt.valid,true)
+  poke(c.io.sc2mac_wt.valid,true)//wt2
   for( n <- 0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_wt.bits.mask(n),wt_mask(1)(n))
   poke(c.io.sc2mac_wt.bits.data(n),wt(1)(n))
@@ -87,7 +87,7 @@ for(layer <-0 to cpl-1){
   else
   poke(c.io.sc2mac_wt.bits.sel(n),0)
   }
-  poke(c.io.sc2mac_dat.valid,true)
+  poke(c.io.sc2mac_dat.valid,true)//dat2
   poke(c.io.sc2mac_dat.bits.pd,(channel_end<<7)+(layer_end<<8))
   for(n<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(n),dat_mask(1)(n))
@@ -96,7 +96,7 @@ for(layer <-0 to cpl-1){
   step(1)
 
   poke(c.io.sc2mac_wt.valid,true)
-  for( n <- 0 to conf.CMAC_ATOMK-1){
+  for( n <- 0 to conf.CMAC_ATOMK-1){//wt3
   poke(c.io.sc2mac_wt.bits.mask(n),wt_mask(2)(n))
   poke(c.io.sc2mac_wt.bits.data(n),wt(2)(n))
   if(n == 2)
@@ -104,7 +104,7 @@ for(layer <-0 to cpl-1){
   else
   poke(c.io.sc2mac_wt.bits.sel(n),0)
   }
-  poke(c.io.sc2mac_dat.valid,true)
+  poke(c.io.sc2mac_dat.valid,true)//dat3
   poke(c.io.sc2mac_dat.bits.pd,(channel_end<<7)+(layer_end<<8))
   for(n<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(n),dat_mask(2)(n))
@@ -113,7 +113,7 @@ for(layer <-0 to cpl-1){
   step(1)
   
   poke(c.io.sc2mac_wt.valid,true)
-  for( n <- 0 to conf.CMAC_ATOMK-1){
+  for( n <- 0 to conf.CMAC_ATOMK-1){//wt4
   poke(c.io.sc2mac_wt.bits.mask(n),wt_mask(3)(n))
   poke(c.io.sc2mac_wt.bits.data(n),wt(3)(n))
   if(n == 3)
@@ -121,7 +121,7 @@ for(layer <-0 to cpl-1){
   else
   poke(c.io.sc2mac_wt.bits.sel(n),0)
   }
-  poke(c.io.sc2mac_dat.valid,true)
+  poke(c.io.sc2mac_dat.valid,true)//dat4
   poke(c.io.sc2mac_dat.bits.pd,(channel_end<<7)+(layer_end<<8))
   for(n<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(n),dat_mask(3)(n))
@@ -129,7 +129,7 @@ for(layer <-0 to cpl-1){
   }
   step(1)
  
-  poke(c.io.sc2mac_wt.valid,true)
+  poke(c.io.sc2mac_wt.valid,true)//wt5
   for( n <- 0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_wt.bits.mask(n),wt_mask(4)(n))
   poke(c.io.sc2mac_wt.bits.data(n),wt(4)(n))
@@ -138,7 +138,7 @@ for(layer <-0 to cpl-1){
   else
   poke(c.io.sc2mac_wt.bits.sel(n),0)
   }
-  poke(c.io.sc2mac_dat.valid,true)
+  poke(c.io.sc2mac_dat.valid,true)//dat5
   poke(c.io.sc2mac_dat.bits.pd,(channel_end<<7)+(layer_end<<8))
   for(n<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(n),dat_mask(4)(n))
@@ -146,7 +146,7 @@ for(layer <-0 to cpl-1){
   }
   step(1)
  
-  poke(c.io.sc2mac_wt.valid,true)
+  poke(c.io.sc2mac_wt.valid,true)//wt6
   for( n <- 0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_wt.bits.mask(n),wt_mask(5)(n))
   poke(c.io.sc2mac_wt.bits.data(n),wt(5)(n))
@@ -155,7 +155,7 @@ for(layer <-0 to cpl-1){
   else
   poke(c.io.sc2mac_wt.bits.sel(n),0)
   }
-  poke(c.io.sc2mac_dat.valid,true)
+  poke(c.io.sc2mac_dat.valid,true)//dat6
   poke(c.io.sc2mac_dat.bits.pd,(channel_end<<7)+(layer_end<<8))
   for(n<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(n),dat_mask(5)(n))
@@ -164,7 +164,7 @@ for(layer <-0 to cpl-1){
   step(1)
 
   poke(c.io.sc2mac_wt.valid,true)
-  for( n <- 0 to conf.CMAC_ATOMK-1){
+  for( n <- 0 to conf.CMAC_ATOMK-1){//wt7
   poke(c.io.sc2mac_wt.bits.mask(n),wt_mask(6)(n))
   poke(c.io.sc2mac_wt.bits.data(n),wt(6)(n))
   if(n == 6)
@@ -172,7 +172,7 @@ for(layer <-0 to cpl-1){
   else
   poke(c.io.sc2mac_wt.bits.sel(n),0)
   }
-  poke(c.io.sc2mac_dat.valid,true)
+  poke(c.io.sc2mac_dat.valid,true)//dat7
   poke(c.io.sc2mac_dat.bits.pd,(channel_end<<7)+(layer_end<<8))
   for(n<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(n),dat_mask(6)(n))
@@ -181,7 +181,7 @@ for(layer <-0 to cpl-1){
   step(1)
 
   poke(c.io.sc2mac_wt.valid,true)
-  for( n <- 0 to conf.CMAC_ATOMK-1){
+  for( n <- 0 to conf.CMAC_ATOMK-1){//wt8
   poke(c.io.sc2mac_wt.bits.mask(n),wt_mask(7)(n))
   poke(c.io.sc2mac_wt.bits.data(n),wt(7)(n))
   if(n == 7)
@@ -189,7 +189,7 @@ for(layer <-0 to cpl-1){
   else
   poke(c.io.sc2mac_wt.bits.sel(n),0)
   }
-  poke(c.io.sc2mac_dat.valid,true)
+  poke(c.io.sc2mac_dat.valid,true)//dat8
   poke(c.io.sc2mac_dat.bits.pd,(1<<6)+(channel_end<<7)+(layer_end<<8))
   for(n<-0 to conf.CMAC_ATOMK-1){
   poke(c.io.sc2mac_dat.bits.mask(n),dat_mask(7)(n))
@@ -231,12 +231,12 @@ for(layer <-0 to cpl-1){
     for(jj<-0 to 7)
     calout(ii)(jj) = psum(ii)(jj) + sum_out(ii)(jj)
   }     
-  if(channel_end == 0){//assembly
+  if(channel_end == 0){//accumulation psum
   for(ii<-0 to 7)
      for(jj<-0 to 7)
      psum(ii)(jj) = calout(ii)(jj)
   }
-  else{//delivery
+  else{//delivery to ppu
   for(ii<-0 to 7)
      for(jj<-0 to 7){
      if(calout(ii)(jj) <0)
