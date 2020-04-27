@@ -22,6 +22,10 @@ class SOMNIA_convolution_Tests2 (c:SOMNIA_convolution) extends PeekPokeTester(c)
   for(i<-0 to 7)
     for(j<-0 to 7)
     psum(i)(j) = 0
+  var fsum = Array.ofDim[BigInt](8,8)
+  for(i<-0 to 7)
+    for(j<-0 to 7)
+    fsum(i)(j) = 0
   var wt_actv_data = Array.ofDim[Int](8,8)//to store actv wt
   var wt_actv_mask = Array.ofDim[Boolean](8,8)
   for (i <- 0 to 7){
@@ -30,8 +34,9 @@ class SOMNIA_convolution_Tests2 (c:SOMNIA_convolution) extends PeekPokeTester(c)
        wt_actv_mask(i)(j)=false
      }
   }
-  val spc = Random.nextInt(9)+1//stripe per channel
-  val cpl = Random.nextInt(9)+1//channel per layer
+for(w<-0 to 100){
+  val spc = Random.nextInt(99)+1//stripe per channel
+  val cpl = Random.nextInt(99)+1//channel per layer
 for(layer <-0 to cpl-1){
   for(i <- 0 to spc-1){
   val wt =Array.ofDim[Int](8,8)//input wt
@@ -219,7 +224,7 @@ for(layer <-0 to cpl-1){
     }
   //cacc
   val bias = BigInt("4294967296")
-  var fsum = Array.ofDim[BigInt](8,8)
+  
   var calout = Array.ofDim[BigInt](8,8)
   if(channel_st == 1){//calculator
   for(ii <-0 to 7)
@@ -230,7 +235,15 @@ for(layer <-0 to cpl-1){
   for(ii<-0 to 7)
     for(jj<-0 to 7)
     calout(ii)(jj) = psum(ii)(jj) + sum_out(ii)(jj)
-  }     
+  } 
+  // psum sat
+  for(ii<-0 to 7)
+    for(jj<-0 to 7){
+      if(calout(ii)(jj)>BigInt("8589934591"))
+        calout(ii)(jj) = BigInt("8589934591")
+      if(calout(ii)(jj)<(0-BigInt("8589934592")))
+        calout(ii)(jj) = (0-BigInt("8589934592")) 
+    }    
   if(channel_end == 0){//not channel end accumulate psum
   for(ii<-0 to 7)
      for(jj<-0 to 7)
@@ -238,11 +251,21 @@ for(layer <-0 to cpl-1){
   }
   else{//channel end deliver final sum to ppu
   for(ii<-0 to 7)
+     for(jj<-0 to 7)   
+     fsum(ii)(jj) = calout(ii)(jj)
+  }
+  //fsum sat
+  for(ii<-0 to 7)
      for(jj<-0 to 7){
-     if(calout(ii)(jj) <0)
-     fsum(ii)(jj) = calout(ii)(jj)+bias
-     else
-     fsum(ii)(jj) = calout(ii)(jj)}
+      if(fsum(ii)(jj) > 2147483647)
+         fsum(ii)(jj) = 2147483647
+      if(fsum(ii)(jj) < -2147483648)
+         fsum(ii)(jj) = -2147483648
+     }
+  for(ii<-0 to 7)
+     for(jj<-0 to 7){
+       if(fsum(ii)(jj)<0)
+         fsum(ii)(jj)=fsum(ii)(jj)+bias
   }
   if(channel_end == 1){//wait for read final data
   poke(c.io.sc2mac_dat.valid,false)
@@ -266,7 +289,7 @@ for(layer <-0 to cpl-1){
   expect(c.io.cacc2ppu_pd_valid,false)}
   }
 
-  }}
+  }}}
 }
 
 class SOMNIA_convolution_Tester2 extends ChiselFlatSpec{
